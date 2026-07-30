@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Especialista · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section specialist-dashboard">
+  <header class="section-head">
+    <h1>Panel especialista</h1>
+    <p>Resumen de tu acceso y carreras disponibles para consulta o edición.</p>
+  </header>
+
+  <div class="stat-grid">
+    <article class="stat">
+      <span class="stat-label">Carreras</span>
+      <strong>{{ careers_count }}</strong>
+    </article>
+    <article class="stat">
+      <span class="stat-label">Con permiso de edición</span>
+      <strong>{{ editable_careers_count }}</strong>
+    </article>
+    <article class="stat">
+      <span class="stat-label">Categorías editables</span>
+      <strong>{{ editable_categories_count }}</strong>
+    </article>
+    <article class="stat">
+      <span class="stat-label">Descuentos activos</span>
+      <strong>{{ discounts_count }}</strong>
+    </article>
+  </div>
+
+  <header class="section-head specialist-careers-head">
+    <h2>Carreras disponibles</h2>
+    <p>Selecciona una carrera para ver su información completa.</p>
+  </header>
+
+  {% if careers %}
+  <div class="specialist-career-grid">
+    {% for career in careers %}
+    <a class="specialist-career-card" href="/specialist/careers/{{ career.id }}">
+      <span class="specialist-career-card-level">{{ career.level_label }}</span>
+      <strong class="specialist-career-card-title">{{ career.name }}</strong>
+      <span class="specialist-career-card-desc">{{ career.description or "Sin descripción" }}</span>
+      <span class="specialist-career-card-cta">Ver información →</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">No hay carreras activas.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admitomi
+      POSTGRES_PASSWORD: admitomi
+      POSTGRES_DB: admitomi
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: AdmiTomi
+      SECRET_KEY: local-docker-secret-key-change-me-32chars
+      DATABASE_URL: postgresql://admitomi:admitomi@db:5432/admitomi
+      UPLOAD_DIR: app/static/uploads
+      DEBUG: "false"
+      COOKIE_NAME: access_token
+      CORS_ORIGINS: http://127.0.0.1:8000,http://localhost:8000
+      ADMIN_PASSWORD: admin123
+      SEED_CLEANUP_TESTS: "false"
+    volumes:
+      - ./app/static/uploads:/app/app/static/uploads
+    depends_on:
+      - db
+
+volumes:
+  pgdata:

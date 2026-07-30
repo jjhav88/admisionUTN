@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+{% block title %}Información · {{ detail.name }} · {{ app_name }}{% endblock %}
+{% block head %}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<section class="section" id="career-info-register-page">
+  <header class="section-head">
+    <p class="eyebrow"><a href="/admin/careers">← Carreras</a></p>
+    <h1>Registrar información</h1>
+    <p>
+      <strong>{{ detail.name }}</strong>
+      {% if detail.description %} — {{ detail.description }}{% endif %}
+    </p>
+  </header>
+
+  {% if detail.categories %}
+  <form id="info-bulk-form" class="stack-form" data-career-id="{{ detail.id }}" novalidate>
+    {% for item in detail.categories %}
+    {% set doc_url = (item.extra_data or {}).get('document_url') %}
+    {% set doc_name = (item.extra_data or {}).get('document_name') %}
+    <article
+      class="panel info-register-block"
+      data-info-block
+      data-category-id="{{ item.category_id }}"
+      data-field-type="{{ item.field_type }}"
+      data-allows-document="{{ 'true' if item.allows_document or item.field_type == 'file' else 'false' }}"
+      data-document-url="{{ doc_url or '' }}"
+      data-document-name="{{ doc_name or '' }}"
+    >
+      <header class="info-register-head">
+        <div>
+          <h2>{{ item.category_name }}</h2>
+          <span class="muted field-type-hint">
+            {% if item.field_type == 'short_text' %}Texto corto
+            {% elif item.field_type == 'single_select' %}Selección única
+            {% elif item.field_type == 'multi_select' %}Selección múltiple
+            {% elif item.field_type == 'select_list' %}Lista de selección
+            {% elif item.field_type == 'weekday_hours' %}Días y horario
+            {% elif item.field_type == 'file' %}Archivo
+            {% elif item.field_type == 'item_list' %}Lista de elementos
+            {% else %}Texto largo{% endif %}
+          </span>
+        </div>
+        {% if item.allows_document or item.field_type == 'file' %}
+        <span class="badge">Archivo PNG/PDF</span>
+        {% endif %}
+      </header>
+
+      {% if item.field_type == 'short_text' %}
+      <label>
+        {{ item.category_name }}
+        <input
+          type="text"
+          class="field-short-text"
+          value="{{ item.content or '' }}"
+          placeholder="Escribe {{ item.category_name | lower }}..."
+        >
+      </label>
+
+      {% elif item.field_type == 'single_select' %}
+      <div class="choice-list" role="radiogroup" aria-label="{{ item.category_name }}">
+        <p class="muted form-hint">Selecciona una opción</p>
+        {% for option in item.field_options %}
+        <label class="checkbox checkbox-card">
+          <input
+            type="radio"
+            class="field-single-select"
+            name="single_{{ item.category_id }}"
+            value="{{ option }}"
+            {% if option in item.selected_values %}checked{% endif %}
+          >
+          <span><strong>{{ option }}</strong></span>
+        </label>
+        {% else %}
+        <p class="muted">Esta categoría no tiene opciones configuradas.</p>
+        {% endfor %}
+      </div>
+
+      {% elif item.field_type == 'select_list' %}
+      <label>
+        {{ item.category_name }}
+        <select class="field-select-list">
+          <option value="">— Seleccionar —</option>
+          {% for option in item.field_options %}
+          <option value="{{ option }}" {% if option in item.selected_values %}selected{% endif %}>
+            {{ option }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+      {% if not item.field_options %}
+      <p class="muted">Esta categoría no tiene opciones configuradas.</p>
+      {% endif %}
+
+      {% elif item.field_type == 'multi_select' %}
+      <div class="choice-list">
+        <p class="muted form-hint">Selecciona una o más opciones</p>
+        {% for option in item.field_options %}
+        <label class="checkbox checkbox-card">
+          <input
+            type="checkbox"
+            class="field-multi-select"
+            value="{{ option }}"
+            {% if option in item.selected_values %}checked{% endif %}
+          >
+          <span><strong>{{ option }}</strong></span>
+        </label>
+        {% else %}
+        <p class="muted">Esta categoría no tiene opciones configuradas.</p>
+        {% endfor %}
+      </div>
+
+      {% elif item.field_type == 'weekday_hours' %}
+      {% set schedule = (item.extra_data or {}).get('schedule') or {} %}
+      <div class="schedule-grid">
+        <label>
+          Día desde
+          <select class="field-day-from">
+            <option value="">— Seleccionar —</option>
+            {% for value, label in [
+              ('lunes', 'Lunes'), ('martes', 'Martes'), ('miercoles', 'Miércoles'),
+              ('jueves', 'Jueves'), ('viernes', 'Viernes'), ('sabado', 'Sábado'), ('domingo', 'Domingo')
+            ] %}
+            <option value="{{ value }}" {% if schedule.get('day_from') == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Día hasta
+          <select class="field-day-to">
+            <option value="">— Seleccionar —</option>
+            {% for value, label in [
+              ('lunes', 'Lunes'), ('martes', 'Martes'), ('miercoles', 'Miércoles'),
+              ('jueves', 'Jueves'), ('viernes', 'Viernes'), ('sabado', 'Sábado'), ('domingo', 'Domingo')
+            ] %}
+            <option value="{{ value }}" {% if schedule.get('day_to') == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Hora desde
+          <input type="time" class="field-time-from" value="{{ schedule.get('time_from') or '' }}">
+        </label>
+        <label>
+          Hora hasta
+          <input type="time" class="field-time-to" value="{{ schedule.get('time_to') or '' }}">
+        </label>
+      </div>
+      <p class="muted form-hint">Ejemplo: Lunes – Viernes, 7:00 a.m. – 5:00 p.m.</p>
+
+      {% elif item.field_type == 'file' %}
+      <p class="muted form-hint">Selecciona un archivo PNG o PDF para esta categoría.</p>
+
+      {% elif item.field_type == 'item_list' %}
+      <div class="item-list-field" data-item-list>
+        <div class="item-list-add">
+          <input
+            type="text"
+            class="field-item-input"
+            placeholder="Escribe un elemento..."
+            maxlength="300"
+          >
+          <button type="button" class="btn btn-secondary" data-add-item>Añadir</button>
+        </div>
+        <ul class="item-list-items">
+          {% for value in item.selected_values %}
+          <li class="item-list-row">
+            <span data-item-value>{{ value }}</span>
+            <button type="button" class="btn btn-ghost btn-sm btn-danger-text" data-remove-item>Quitar</button>
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="muted form-hint item-list-empty" {% if item.selected_values %}hidden{% endif %}>
+          Aún no hay elementos. Escribe uno y pulsa Añadir.
+        </p>
+      </div>
+
+      {% else %}
+      <textarea class="initial-content" hidden>{{ item.content or '' }}</textarea>
+      <div
+        class="quill-editor quill-box"
+        data-placeholder="Escribe {{ item.category_name | lower }}..."
+      ></div>
+      {% endif %}
+
+      {% if item.allows_document or item.field_type == 'file' %}
+      <div class="document-upload-block">
+        <label class="upload-field">
+          {% if item.field_type == 'file' %}Archivo (PNG o PDF){% else %}Documento adicional (PNG o PDF){% endif %}
+          <input
+            type="file"
+            class="document-upload"
+            accept=".png,.pdf,image/png,application/pdf"
+          >
+        </label>
+        <div class="document-preview" {% if not doc_url %}hidden{% endif %}>
+          {% if doc_url and doc_url.lower().endswith('.png') %}
+          <img src="{{ doc_url }}" alt="{{ doc_name or 'Documento' }}" class="document-preview-image">
+          {% elif doc_url %}
+          <a class="btn btn-secondary btn-sm" href="{{ doc_url }}" target="_blank" rel="noopener">
+            Ver {{ doc_name or 'documento PDF' }}
+          </a>
+          {% endif %}
+          {% if doc_url %}
+          <button type="button" class="btn btn-ghost btn-sm btn-danger-text document-remove">
+            Quitar {% if item.field_type == 'file' %}archivo{% else %}documento{% endif %}
+          </button>
+          {% endif %}
+        </div>
+        <p class="muted form-hint">Solo se aceptan archivos .png o .pdf.</p>
+      </div>
+      {% endif %}
+    </article>
+    {% endfor %}
+
+    <div class="form-actions panel info-register-actions">
+      <a class="btn btn-ghost" href="/admin/careers">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar toda la información</button>
+    </div>
+  </form>
+  {% else %}
+  <p class="empty-state">
+    Aún no hay categorías. Crea categorías en
+    <a href="/admin/categories">Categorías</a>
+    y vuelve a registrar la información de esta carrera.
+  </p>
+  {% endif %}
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+{% endblock %}

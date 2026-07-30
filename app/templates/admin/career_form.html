@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if career else "Nueva" }} carrera · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section narrow">
+  <header class="section-head">
+    <h1>{{ "Editar carrera" if career else "Nueva carrera" }}</h1>
+  </header>
+
+  <form id="career-form" class="stack-form panel" data-career-id="{{ career.id if career else '' }}" novalidate>
+    <label>
+      Nombre
+      <input type="text" name="name" required value="{{ career.name if career else '' }}">
+    </label>
+    <label>
+      Nivel
+      <select name="level" required>
+        {% for level in levels %}
+        <option
+          value="{{ level.value }}"
+          {% if career and career.level.value == level.value %}selected{% elif not career and level.value == 'licenciatura' %}selected{% endif %}
+        >{{ level.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Descripción
+      <textarea name="description" rows="4">{{ career.description if career and career.description else '' }}</textarea>
+    </label>
+    {% if career %}
+    <label class="checkbox">
+      <input type="checkbox" name="is_active" {% if career.is_active %}checked{% endif %}>
+      Activa
+    </label>
+    {% endif %}
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="/admin/careers">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

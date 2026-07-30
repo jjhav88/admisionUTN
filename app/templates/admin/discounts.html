@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Descuentos · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section" id="discounts-page">
+  <header class="section-head row">
+    <div>
+      <h1>Descuentos</h1>
+      <p>Crea, edita, elimina y busca promociones por carrera.</p>
+    </div>
+    <a class="btn btn-primary" href="/admin/discounts/new">Nuevo descuento</a>
+  </header>
+
+  <form id="discount-search-form" class="inline-form panel" novalidate>
+    <label>
+      Buscar
+      <input type="search" name="q" placeholder="Título, carrera, categoría...">
+    </label>
+    <label>
+      Estado
+      <select name="is_active">
+        <option value="">Todos</option>
+        <option value="true">Activos</option>
+        <option value="false">Inactivos</option>
+      </select>
+    </label>
+  </form>
+
+  <div class="table-wrap">
+    <table id="discounts-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Carrera</th>
+          <th>Categoría</th>
+          <th>%</th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for discount in discounts %}
+        <tr data-discount-id="{{ discount.id }}">
+          <td>{{ discount.title }}</td>
+          <td>{{ discount.career_name or "—" }}</td>
+          <td>{{ discount.category_name or "General" }}</td>
+          <td>{{ discount.percentage }}%</td>
+          <td>{{ discount.start_date or "—" }}</td>
+          <td>{{ discount.end_date or "Ilimitado" }}</td>
+          <td>
+            <span class="badge {% if discount.is_active %}badge-ok{% else %}badge-muted{% endif %}">
+              {{ "Activo" if discount.is_active else "Inactivo" }}
+            </span>
+          </td>
+          <td class="actions">
+            <a class="btn btn-ghost btn-sm" href="/admin/discounts/{{ discount.id }}/edit">Editar</a>
+            <button
+              type="button"
+              class="btn btn-ghost btn-sm btn-danger-text"
+              data-delete-discount="{{ discount.id }}"
+              data-discount-title="{{ discount.title }}"
+            >Eliminar</button>
+          </td>
+        </tr>
+        {% else %}
+        <tr id="discounts-empty-row"><td colspan="8">Aún no hay descuentos. Crea el primero con “Nuevo descuento”.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

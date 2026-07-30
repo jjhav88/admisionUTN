@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if category else "Nueva" }} categoría · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section narrow">
+  <header class="section-head">
+    <h1>{{ "Editar categoría" if category else "Nueva categoría" }}</h1>
+  </header>
+
+  <form
+    id="category-form"
+    class="stack-form panel"
+    data-category-id="{{ category.id if category else '' }}"
+    novalidate
+  >
+    <label>
+      Nombre
+      <input type="text" name="name" required value="{{ category.name if category else '' }}">
+    </label>
+    <label>
+      Descripción
+      <textarea name="description" rows="3">{{ category.description if category and category.description else '' }}</textarea>
+    </label>
+
+    <label>
+      Tipo de dato
+      <select name="field_type" id="category-field-type" required>
+        {% for field in field_types %}
+        <option
+          value="{{ field.value }}"
+          {% if category and category.field_type.value == field.value %}selected{% elif not category and field.value == 'long_text' %}selected{% endif %}
+        >{{ field.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <p class="muted form-hint">
+      Define cómo se captura la información de esta categoría al registrar datos de una carrera.
+    </p>
+
+    <fieldset class="checkbox-fieldset" id="category-options-block" hidden>
+      <legend>Opciones de selección</legend>
+      <p class="muted form-hint">Agrega las opciones que se mostrarán al llenar la información (mínimo 2).</p>
+      <div id="category-options-list" class="options-list">
+        {% set options = category.options_list if category else [] %}
+        {% if options %}
+          {% for option in options %}
+          <div class="option-row">
+            <input type="text" name="field_options" value="{{ option }}" placeholder="Opción">
+            <button type="button" class="btn btn-ghost btn-sm btn-danger-text" data-remove-option>Quitar</button>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="option-row">
+            <input type="text" name="field_options" placeholder="Opción 1">
+            <button type="button" class="btn btn-ghost btn-sm btn-danger-text" data-remove-option>Quitar</button>
+          </div>
+          <div class="option-row">
+            <input type="text" name="field_options" placeholder="Opción 2">
+            <button type="button" class="btn btn-ghost btn-sm btn-danger-text" data-remove-option>Quitar</button>
+          </div>
+        {% endif %}
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="add-category-option">Agregar opción</button>
+    </fieldset>
+
+    <label class="checkbox">
+      <input
+        type="checkbox"
+        name="is_editable"
+        {% if not category or category.is_editable %}checked{% endif %}
+      >
+      Editable por especialistas (según permisos)
+    </label>
+
+    <p class="muted form-hint" id="file-type-hint" {% if not category or not category.field_type or category.field_type.value != 'file' %}hidden{% endif %}>
+      En el formulario de Información se mostrará un campo para cargar un archivo (PNG o PDF).
+    </p>
+    <p class="muted form-hint" id="item-list-type-hint" {% if not category or not category.field_type or category.field_type.value != 'item_list' %}hidden{% endif %}>
+      En el formulario de Información podrás escribir elementos uno a uno y añadirlos a una lista.
+    </p>
+
+    <div id="document-extra-block" {% if category and category.field_type and category.field_type.value == 'file' %}hidden{% endif %}>
+      <label class="checkbox">
+        <input
+          type="checkbox"
+          name="allows_document"
+          id="allows-document"
+          {% if category and category.allows_document and (not category.field_type or category.field_type.value != 'file') %}checked{% endif %}
+        >
+        Incluye carga de documento adicional (PNG o PDF)
+      </label>
+      <p class="muted form-hint" id="document-hint" {% if not category or not category.allows_document or (category.field_type and category.field_type.value == 'file') %}hidden{% endif %}>
+        Además del tipo de dato principal, permitirá adjuntar un archivo al registrar la información.
+      </p>
+    </div>
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="/admin/categories">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

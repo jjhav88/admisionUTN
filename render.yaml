@@ -1,0 +1,46 @@
+databases:
+  - name: admitomi-db
+    plan: free
+    databaseName: admitomi
+    user: admitomi
+
+services:
+  - type: web
+    name: admitomi
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --workers 2
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.8"
+      - key: APP_NAME
+        value: AdmiTomi
+      - key: DEBUG
+        value: "false"
+      - key: COOKIE_NAME
+        value: access_token
+      - key: LOGIN_RATE_LIMIT
+        value: 10/minute
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: admitomi-db
+          property: connectionString
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_EMAIL
+        value: admin@admitomi.com
+      - key: CORS_ORIGINS
+        sync: false
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      - key: SEED_CLEANUP_TESTS
+        value: "false"
+    disk:
+      name: admitomi-uploads
+      mountPath: /var/data
+      sizeGB: 1

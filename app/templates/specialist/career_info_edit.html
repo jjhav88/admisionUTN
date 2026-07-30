@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Editar · {{ info.category_name }} · {{ app_name }}{% endblock %}
+{% block body_class %}report-view{% endblock %}
+{% block head %}
+{% if info.field_type == 'long_text' %}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+{% endif %}
+{% endblock %}
+{% block content %}
+{% set doc_url = (info.extra_data or {}).get('document_url') %}
+{% set doc_name = (info.extra_data or {}).get('document_name') %}
+{% set schedule = (info.extra_data or {}).get('schedule') or {} %}
+
+<section class="specialist-report-page">
+  <article class="report-document report-edit-document" role="dialog" aria-modal="true" aria-labelledby="report-edit-title">
+    <a class="report-close" href="/specialist/careers/{{ career_id }}" aria-label="Cerrar" title="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.29 19.7 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3z"/>
+      </svg>
+    </a>
+
+    <header class="report-header">
+      <p class="report-eyebrow">Edición de categoría</p>
+      <h1 class="report-title" id="report-edit-title">{{ info.category_name }}</h1>
+      <p class="report-lead">
+        {% if info.field_type == 'short_text' %}Texto corto
+        {% elif info.field_type == 'long_text' %}Texto largo
+        {% elif info.field_type == 'single_select' %}Selección única
+        {% elif info.field_type == 'multi_select' %}Selección múltiple
+        {% elif info.field_type == 'select_list' %}Lista de selección
+        {% elif info.field_type == 'weekday_hours' %}Días y horario
+        {% elif info.field_type == 'file' %}Archivo
+        {% elif info.field_type == 'item_list' %}Lista de elementos
+        {% else %}{{ info.field_type }}
+        {% endif %}
+      </p>
+    </header>
+
+    <form
+      id="info-edit-form"
+      class="stack-form report-edit-form"
+      data-career-id="{{ career_id }}"
+      data-category-id="{{ info.category_id }}"
+      data-field-type="{{ info.field_type }}"
+      data-allows-document="{{ 'true' if info.allows_document or info.field_type == 'file' else 'false' }}"
+      data-document-url="{{ doc_url or '' }}"
+      data-document-name="{{ doc_name or '' }}"
+      novalidate
+    >
+      {% if info.field_type == 'short_text' %}
+      <label>
+        Contenido
+        <input
+          type="text"
+          class="field-short-text"
+          name="content"
+          value="{{ info.content or '' }}"
+          maxlength="500"
+          placeholder="Escribe el contenido..."
+        >
+      </label>
+
+      {% elif info.field_type == 'single_select' %}
+      <div class="choice-list" role="radiogroup" aria-label="{{ info.category_name }}">
+        <p class="form-hint">Selecciona una opción</p>
+        {% for option in info.field_options %}
+        <label class="checkbox checkbox-card">
+          <input
+            type="radio"
+            class="field-single-select"
+            name="single_edit"
+            value="{{ option }}"
+            {% if option in info.selected_values %}checked{% endif %}
+          >
+          <span><strong>{{ option }}</strong></span>
+        </label>
+        {% else %}
+        <p class="form-hint">Esta categoría no tiene opciones configuradas.</p>
+        {% endfor %}
+      </div>
+
+      {% elif info.field_type == 'select_list' %}
+      <label>
+        {{ info.category_name }}
+        <select class="field-select-list">
+          <option value="">— Seleccionar —</option>
+          {% for option in info.field_options %}
+          <option value="{{ option }}" {% if option in info.selected_values %}selected{% endif %}>
+            {{ option }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      {% elif info.field_type == 'multi_select' %}
+      <div class="choice-list">
+        <p class="form-hint">Selecciona una o más opciones</p>
+        {% for option in info.field_options %}
+        <label class="checkbox checkbox-card">
+          <input
+            type="checkbox"
+            class="field-multi-select"
+            value="{{ option }}"
+            {% if option in info.selected_values %}checked{% endif %}
+          >
+          <span><strong>{{ option }}</strong></span>
+        </label>
+        {% else %}
+        <p class="form-hint">Esta categoría no tiene opciones configuradas.</p>
+        {% endfor %}
+      </div>
+
+      {% elif info.field_type == 'weekday_hours' %}
+      <div class="schedule-grid">
+        <label>
+          Día desde
+          <select class="field-day-from">
+            <option value="">— Seleccionar —</option>
+            {% for value, label in [
+              ('lunes', 'Lunes'), ('martes', 'Martes'), ('miercoles', 'Miércoles'),
+              ('jueves', 'Jueves'), ('viernes', 'Viernes'), ('sabado', 'Sábado'), ('domingo', 'Domingo')
+            ] %}
+            <option value="{{ value }}" {% if schedule.get('day_from') == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Día hasta
+          <select class="field-day-to">
+            <option value="">— Seleccionar —</option>
+            {% for value, label in [
+              ('lunes', 'Lunes'), ('martes', 'Martes'), ('miercoles', 'Miércoles'),
+              ('jueves', 'Jueves'), ('viernes', 'Viernes'), ('sabado', 'Sábado'), ('domingo', 'Domingo')
+            ] %}
+            <option value="{{ value }}" {% if schedule.get('day_to') == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Hora desde
+          <input type="time" class="field-time-from" value="{{ schedule.get('time_from') or '' }}">
+        </label>
+        <label>
+          Hora hasta
+          <input type="time" class="field-time-to" value="{{ schedule.get('time_to') or '' }}">
+        </label>
+      </div>
+      <p class="form-hint">Ejemplo: Lunes – Viernes, 7:00 a.m. – 5:00 p.m.</p>
+
+      {% elif info.field_type == 'file' %}
+      <p class="form-hint">Selecciona un archivo PNG o PDF para esta categoría.</p>
+
+      {% elif info.field_type == 'item_list' %}
+      <div class="item-list-field" data-item-list>
+        <div class="item-list-add">
+          <input type="text" class="field-item-input" placeholder="Escribe un elemento..." maxlength="300">
+          <button type="button" class="btn btn-secondary" data-add-item>Añadir</button>
+        </div>
+        <ul class="item-list-items">
+          {% for value in info.selected_values %}
+          <li class="item-list-row">
+            <span data-item-value>{{ value }}</span>
+            <button type="button" class="btn btn-ghost btn-sm btn-danger-text" data-remove-item>Quitar</button>
+          </li>
+          {% endfor %}
+        </ul>
+        <p class="form-hint item-list-empty" {% if info.selected_values %}hidden{% endif %}>
+          Aún no hay elementos. Escribe uno y pulsa Añadir.
+        </p>
+      </div>
+
+      {% else %}
+      <textarea id="initial-content" hidden>{{ info.content or '' }}</textarea>
+      <div id="quill-editor" class="quill-box" data-placeholder="Escribe el contenido..."></div>
+      {% endif %}
+
+      {% if info.allows_document or info.field_type == 'file' %}
+      <div class="document-upload-block" id="document-upload-block">
+        <label class="upload-field">
+          {% if info.field_type == 'file' %}Archivo (PNG o PDF){% else %}Documento adicional (PNG o PDF){% endif %}
+          <input
+            id="document-upload"
+            type="file"
+            accept=".png,.pdf,image/png,application/pdf"
+          >
+        </label>
+        <div id="document-preview" class="document-preview" {% if not doc_url %}hidden{% endif %}>
+          {% if doc_url and doc_url.lower().endswith('.png') %}
+          <img src="{{ doc_url }}" alt="{{ doc_name or 'Documento' }}" class="document-preview-image">
+          {% elif doc_url %}
+          <a class="btn btn-secondary btn-sm" href="{{ doc_url }}" target="_blank" rel="noopener">
+            Ver {{ doc_name or 'documento PDF' }}
+          </a>
+          {% endif %}
+          <button type="button" class="btn btn-ghost btn-sm btn-danger-text" id="document-remove">
+            Quitar {% if info.field_type == 'file' %}archivo{% else %}documento{% endif %}
+          </button>
+        </div>
+        <p class="form-hint">Solo se aceptan archivos .png o .pdf.</p>
+      </div>
+      {% endif %}
+
+      <div class="form-actions">
+        <a class="btn btn-ghost" href="/specialist/careers/{{ career_id }}">Cancelar</a>
+        <button class="btn btn-primary" type="submit">Guardar cambios</button>
+      </div>
+    </form>
+  </article>
+</section>
+{% endblock %}
+{% block scripts %}
+{% if info.field_type == 'long_text' %}
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+{% endif %}
+{% endblock %}

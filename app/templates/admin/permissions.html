@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Permisos · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <header class="section-head">
+    <h1>Permisos de edición</h1>
+    <p>Elige el especialista y marca las categorías y carreras que podrá editar.</p>
+  </header>
+
+  <form id="permission-form" class="stack-form panel permission-form" novalidate>
+    <label class="permission-user">
+      Especialista
+      <select name="user_id" required>
+        {% if users %}
+          {% for item in users %}
+          <option value="{{ item.id }}">{{ item.full_name or item.username }} ({{ item.username }})</option>
+          {% endfor %}
+        {% else %}
+          <option value="" disabled selected>No hay especialistas creados</option>
+        {% endif %}
+      </select>
+    </label>
+
+    <div class="permission-columns">
+      <fieldset class="checkbox-fieldset">
+        <legend>Categorías</legend>
+        {% if categories %}
+        <div class="checkbox-toolbar">
+          <label class="checkbox checkbox-inline">
+            <input type="checkbox" id="categories-select-all" checked>
+            Seleccionar todas
+          </label>
+          <span class="muted" id="categories-selected-count">{{ categories|length }} seleccionadas</span>
+        </div>
+        <div class="checkbox-list" id="categories-checkbox-list">
+          {% for category in categories %}
+          <label class="checkbox checkbox-card">
+            <input type="checkbox" name="category_ids" value="{{ category.id }}" checked>
+            <span>
+              <strong>{{ category.name }}</strong>
+              {% if category.description %}
+              <small class="muted">{{ category.description }}</small>
+              {% endif %}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">Aún no hay categorías. Créalas antes de asignar permisos.</p>
+        {% endif %}
+      </fieldset>
+
+      <fieldset class="checkbox-fieldset">
+        <legend>Carreras</legend>
+        {% if careers %}
+        <div class="checkbox-toolbar">
+          <label class="checkbox checkbox-inline">
+            <input type="checkbox" id="careers-select-all" checked>
+            Seleccionar todas
+          </label>
+          <span class="muted" id="careers-selected-count">{{ careers|length }} seleccionadas</span>
+        </div>
+        <div class="checkbox-list" id="careers-checkbox-list">
+          {% for career in careers %}
+          <label class="checkbox checkbox-card">
+            <input type="checkbox" name="career_ids" value="{{ career.id }}" checked>
+            <span>
+              <strong>{{ career.name }}</strong>
+              {% if career.level_label %}
+              <small class="muted">{{ career.level_label }}</small>
+              {% endif %}
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty-state">Aún no hay carreras. Créalas antes de asignar permisos.</p>
+        {% endif %}
+      </fieldset>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit" {% if not users or not careers or not categories %}disabled{% endif %}>
+        Asignar permisos
+      </button>
+    </div>
+  </form>
+
+  <section class="panel permission-viewer" id="permission-viewer">
+    <header class="permission-viewer-head">
+      <div>
+        <h2>Consultar permisos</h2>
+        <p class="muted">Selecciona un usuario y una carrera para ver el estado por categoría.</p>
+      </div>
+    </header>
+
+    <div class="permission-viewer-filters">
+      <label>
+        Usuario
+        <select id="perm-view-user">
+          <option value="">— Seleccionar especialista —</option>
+          {% for item in users %}
+          <option value="{{ item.id }}">{{ item.full_name or item.username }} ({{ item.username }})</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Carrera
+        <select id="perm-view-career" disabled>
+          <option value="">— Primero selecciona un usuario —</option>
+          {% for career in careers %}
+          <option value="{{ career.id }}">{{ career.name }}{% if career.level_label %} · {{ career.level_label }}{% endif %}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+
+    <div class="table-wrap">
+      <table id="perm-view-table">
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Puede editar</th>
+          </tr>
+        </thead>
+        <tbody id="perm-view-tbody">
+          <tr>
+            <td colspan="2" class="muted">Selecciona un usuario y una carrera para ver los permisos.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
+
+<script type="application/json" id="permissions-data">{{ permissions_json | safe }}</script>
+<script type="application/json" id="permission-careers-data">{{ careers_json | safe }}</script>
+<script type="application/json" id="permission-categories-data">{{ categories_json | safe }}</script>
+{% endblock %}

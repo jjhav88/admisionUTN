@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if discount else "Nuevo" }} descuento · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section narrow">
+  <header class="section-head">
+    <h1>{{ "Editar descuento" if discount else "Nuevo descuento" }}</h1>
+  </header>
+
+  <form
+    id="discount-form"
+    class="stack-form panel discount-form"
+    data-discount-id="{{ discount.id if discount else '' }}"
+    novalidate
+  >
+    <div class="discount-grid">
+      <label>
+        Carrera
+        <select name="career_id" required>
+          {% for career in careers %}
+          <option
+            value="{{ career.id }}"
+            {% if discount and discount.career_id == career.id %}selected{% endif %}
+          >{{ career.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Categoría (opcional)
+        <select name="category_id">
+          <option value="">General</option>
+          {% for category in categories %}
+          <option
+            value="{{ category.id }}"
+            {% if discount and discount.category_id == category.id %}selected{% endif %}
+          >{{ category.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        Título
+        <input type="text" name="title" required value="{{ discount.title if discount else 'Descuento' }}">
+      </label>
+      <label>
+        Porcentaje
+        <input
+          type="number"
+          name="percentage"
+          min="0"
+          max="100"
+          step="0.01"
+          required
+          value="{{ discount.percentage if discount else '' }}"
+        >
+      </label>
+    </div>
+
+    <label>
+      Descripción
+      <input type="text" name="description" value="{{ discount.description if discount and discount.description else '' }}">
+    </label>
+
+    <div class="discount-validity">
+      <label>
+        Fecha de inicio
+        <input
+          type="date"
+          name="start_date"
+          required
+          value="{{ discount.start_date if discount and discount.start_date else '' }}"
+        >
+      </label>
+
+      <div class="validity-end">
+        <label class="switch-field">
+          <span class="switch">
+            <input
+              type="checkbox"
+              name="unlimited"
+              id="discount-unlimited"
+              {% if not discount or not discount.end_date %}checked{% endif %}
+            >
+            <span class="switch-slider"></span>
+          </span>
+          <span class="switch-label">
+            <strong>Vigencia ilimitada</strong>
+            <small class="muted">Si lo apagas, habilita la fecha de fin</small>
+          </span>
+        </label>
+
+        <label id="discount-end-date-wrap">
+          Fecha de fin
+          <input
+            type="date"
+            name="end_date"
+            id="discount-end-date"
+            value="{{ discount.end_date if discount and discount.end_date else '' }}"
+            {% if not discount or not discount.end_date %}disabled{% endif %}
+          >
+        </label>
+      </div>
+    </div>
+
+    {% if discount %}
+    <label class="checkbox">
+      <input type="checkbox" name="is_active" {% if discount.is_active %}checked{% endif %}>
+      Activo
+    </label>
+    {% endif %}
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="/admin/discounts">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

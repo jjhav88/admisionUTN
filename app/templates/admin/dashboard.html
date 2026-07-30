@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Admin · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section">
+  <header class="section-head">
+    <h1>Panel administrador</h1>
+    <p>Resumen operativo del sistema de admisión.</p>
+  </header>
+
+  <div class="stat-grid">
+    <article class="stat">
+      <span class="stat-label">Carreras</span>
+      <strong>{{ careers_count }}</strong>
+    </article>
+    <article class="stat">
+      <span class="stat-label">Categorías</span>
+      <strong>{{ categories_count }}</strong>
+    </article>
+    <article class="stat">
+      <span class="stat-label">Usuarios</span>
+      <strong>{{ users_count }}</strong>
+    </article>
+    <article class="stat">
+      <span class="stat-label">Descuentos</span>
+      <strong>{{ discounts_count }}</strong>
+    </article>
+  </div>
+</section>
+{% endblock %}

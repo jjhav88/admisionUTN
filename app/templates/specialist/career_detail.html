@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ detail.name }} · {{ app_name }}{% endblock %}
+{% block body_class %}report-view{% endblock %}
+{% block content %}
+<section class="specialist-report-page">
+  <article class="report-document" role="dialog" aria-modal="true" aria-labelledby="report-title">
+    <a class="report-close" href="/specialist" aria-label="Cerrar" title="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.29 19.7 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3z"/>
+      </svg>
+    </a>
+
+    <header class="report-header">
+      <p class="report-eyebrow">Informe de carrera</p>
+      <h1 class="report-title" id="report-title">{{ detail.name }}</h1>
+      {% if detail.description %}
+      <p class="report-lead">{{ detail.description }}</p>
+      {% endif %}
+      <div class="report-meta">
+        <span>{{ detail.categories | length }} categorías</span>
+        <span>{{ editable_count }} con permiso de edición</span>
+      </div>
+    </header>
+
+    <div class="report-body">
+      {% for item in detail.categories %}
+      <section class="report-section">
+        <div class="report-section-head">
+          <h2>{{ item.category_name }}</h2>
+          <div class="report-section-actions">
+            {% if item.can_edit %}
+            <a
+              class="report-edit-btn"
+              href="/specialist/careers/{{ detail.id }}/info/{{ item.category_id }}/edit"
+              title="Editar {{ item.category_name }}"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zm17.71-10.04a1 1 0 0 0 0-1.41l-2.51-2.51a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.99-1.66z"/>
+              </svg>
+              <span>Editar</span>
+            </a>
+            {% else %}
+            <span class="report-no-perm">Sin permiso de edición</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="report-section-content">
+          {% if item.field_type == 'file' and not item.content and not (item.extra_data or {}).get('document_url') %}
+            <p class="report-empty">Sin archivo.</p>
+          {% elif item.field_type in ['single_select', 'multi_select', 'select_list', 'item_list'] and item.selected_values %}
+            <ul class="report-list">
+              {% for value in item.selected_values %}
+              <li>{{ value }}</li>
+              {% endfor %}
+            </ul>
+          {% elif item.field_type == 'item_list' %}
+            <p class="report-empty">Sin elementos.</p>
+          {% elif item.content and item.field_type != 'file' %}
+            {% if item.field_type == 'long_text' %}
+              <div class="report-richtext">{{ item.content | safe }}</div>
+            {% else %}
+              <p>{{ item.content }}</p>
+            {% endif %}
+          {% elif item.field_type != 'file' %}
+            <p class="report-empty">Sin contenido.</p>
+          {% endif %}
+
+          {% set doc_url = (item.extra_data or {}).get('document_url') %}
+          {% set doc_name = (item.extra_data or {}).get('document_name') %}
+          {% if (item.allows_document or item.field_type == 'file') and doc_url %}
+          <div class="report-document-file">
+            {% if doc_url.lower().endswith('.png') %}
+            <img src="{{ doc_url }}" alt="{{ doc_name or item.category_name }}" class="document-preview-image">
+            {% else %}
+            <a class="report-file-link" href="{{ doc_url }}" target="_blank" rel="noopener">
+              Abrir {{ doc_name or 'archivo' }}
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </section>
+      {% else %}
+      <p class="report-empty">Aún no hay categorías configuradas.</p>
+      {% endfor %}
+    </div>
+  </article>
+</section>
+{% endblock %}

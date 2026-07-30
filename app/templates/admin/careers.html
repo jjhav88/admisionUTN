@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Carreras · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section" id="careers-page">
+  <header class="section-head row">
+    <div>
+      <h1>Carreras</h1>
+      <p>Crea, edita, elimina y reordena arrastrando los paneles.</p>
+    </div>
+    <a class="btn btn-primary" href="/admin/careers/new">Nueva carrera</a>
+  </header>
+
+  <form id="career-search-form" class="inline-form panel" novalidate>
+    <label>
+      Buscar
+      <input type="search" name="q" placeholder="Nombre, slug o descripción...">
+    </label>
+    <label>
+      Nivel
+      <select name="level">
+        <option value="">Todos</option>
+        {% for level in levels %}
+        <option value="{{ level.value }}">{{ level.label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>
+      Estado
+      <select name="is_active">
+        <option value="">Todos</option>
+        <option value="true">Activas</option>
+        <option value="false">Inactivas</option>
+      </select>
+    </label>
+  </form>
+
+  <p class="muted drag-hint">Arrastra los paneles para definir el orden de visualización.</p>
+
+  <div id="careers-list" class="career-board">
+    {% for career in careers %}
+    <article class="career-card" draggable="true" data-career-id="{{ career.id }}">
+      <div class="career-card-handle" title="Arrastrar">⋮⋮</div>
+      <div class="career-card-body">
+        <strong>{{ career.name }}</strong>
+        <span class="muted">{{ career.description or "Sin descripción" }}</span>
+        <div class="career-card-meta">
+          <span class="badge">{{ career.level_label }}</span>
+          <code>{{ career.slug }}</code>
+          <span class="badge {% if career.is_active %}badge-ok{% else %}badge-muted{% endif %}">
+            {{ "Activa" if career.is_active else "Inactiva" }}
+          </span>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn btn-secondary btn-sm" href="/admin/careers/{{ career.id }}/info">Información</a>
+        <a class="btn btn-ghost btn-sm" href="/admin/careers/{{ career.id }}/edit">Editar</a>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm btn-danger-text"
+          data-delete-career="{{ career.id }}"
+          data-career-name="{{ career.name }}"
+        >Eliminar</button>
+      </div>
+    </article>
+    {% else %}
+    <p class="empty-state" id="careers-empty">Aún no hay carreras. Crea la primera con “Nueva carrera”.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

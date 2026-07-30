@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Mi perfil · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section narrow">
+  <header class="section-head">
+    <p class="eyebrow">Cuenta</p>
+    <h1>Mi perfil</h1>
+    <p>Actualiza tu información personal y tu foto de perfil.</p>
+  </header>
+
+  <form id="profile-form" class="stack-form panel" novalidate>
+    <div class="avatar-picker">
+      {% if user.avatar_url %}
+      <img id="profile-avatar-preview" class="avatar-circle avatar-lg" src="{{ user.avatar_url }}" alt="Foto de perfil">
+      <span id="profile-avatar-fallback" class="avatar-circle avatar-lg avatar-fallback" hidden>
+        {{ (user.full_name or user.username)[0]|upper }}
+      </span>
+      {% else %}
+      <img id="profile-avatar-preview" class="avatar-circle avatar-lg" src="" alt="Foto de perfil" hidden>
+      <span id="profile-avatar-fallback" class="avatar-circle avatar-lg avatar-fallback">
+        {{ (user.full_name or user.username)[0]|upper }}
+      </span>
+      {% endif %}
+      <label class="upload-field">
+        Foto de perfil
+        <input id="profile-avatar-input" type="file" name="avatar" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
+        <small class="muted">PNG, JPG o WEBP. Máx. 5 MB.</small>
+      </label>
+    </div>
+
+    <label>
+      Usuario
+      <input type="text" name="username" required minlength="3" value="{{ user.username }}">
+    </label>
+    <label>
+      Email
+      <input type="email" name="email" required value="{{ user.email }}">
+    </label>
+    <label>
+      Nombre completo
+      <input type="text" name="full_name" value="{{ user.full_name or '' }}">
+    </label>
+    <label>
+      Nueva contraseña
+      <input type="password" name="password" minlength="6" autocomplete="new-password" placeholder="Dejar vacío para no cambiar">
+      <small class="muted">Solo completa este campo si quieres cambiarla</small>
+    </label>
+
+    <div class="profile-meta">
+      <span class="badge">Rol: {{ user.role_name }}</span>
+      <span class="badge {% if user.is_active %}badge-ok{% else %}badge-muted{% endif %}">
+        {{ "Activo" if user.is_active else "Inactivo" }}
+      </span>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn-ghost" href="{{ '/admin' if user.role_name == 'admin' else '/specialist' }}">Volver</a>
+      <button class="btn btn-primary" type="submit">Guardar cambios</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

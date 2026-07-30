@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Settings · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section narrow">
+  <header class="section-head">
+    <h1>Settings</h1>
+    <p>Configura el logo del header, el escudo del footer y los datos de contacto.</p>
+  </header>
+
+  <form id="settings-form" class="stack-form" novalidate>
+    <section class="panel settings-block">
+      <h2>Header</h2>
+      <div class="settings-logo-row">
+        {% if site.header_logo_url %}
+        <img id="header-logo-preview" class="settings-logo-preview" src="{{ site.header_logo_url }}" alt="Logo header">
+        {% else %}
+        <img id="header-logo-preview" class="settings-logo-preview" src="" alt="Logo header" hidden>
+        <span id="header-logo-fallback" class="settings-logo-fallback">Sin logo</span>
+        {% endif %}
+        <label class="upload-field">
+          Logo del header
+          <input id="header-logo-input" type="file" name="header_logo" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
+          <small class="muted">PNG, JPG o WEBP. Máx. 5 MB.</small>
+        </label>
+      </div>
+      <label>
+        Título / nombre en header
+        <input type="text" name="header_title" value="{{ site.header_title or app_name }}" maxlength="200">
+      </label>
+    </section>
+
+    <section class="panel settings-block">
+      <h2>Footer</h2>
+      <div class="settings-logo-row">
+        {% if site.footer_logo_url %}
+        <img id="footer-logo-preview" class="settings-logo-preview settings-logo-shield" src="{{ site.footer_logo_url }}" alt="Escudo">
+        {% else %}
+        <img id="footer-logo-preview" class="settings-logo-preview settings-logo-shield" src="" alt="Escudo" hidden>
+        <span id="footer-logo-fallback" class="settings-logo-fallback">Sin escudo</span>
+        {% endif %}
+        <label class="upload-field">
+          Escudo / logo (izquierda)
+          <input id="footer-logo-input" type="file" name="footer_logo" accept=".png,.jpg,.jpeg,.webp,.gif,image/*">
+          <small class="muted">PNG, JPG o WEBP. Máx. 5 MB.</small>
+        </label>
+      </div>
+      <label>
+        Título del footer
+        <input type="text" name="footer_title" value="{{ site.footer_title or '' }}" maxlength="255">
+      </label>
+      <label>
+        Organización
+        <input type="text" name="footer_org" value="{{ site.footer_org or '' }}" maxlength="255">
+      </label>
+      <label>
+        Texto de derechos
+        <input type="text" name="footer_copy" value="{{ site.footer_copy or '' }}" maxlength="255">
+      </label>
+
+      <h3 class="settings-subtitle">Contacto (derecha del footer)</h3>
+      <p class="muted form-hint">Visible para administradores y especialistas.</p>
+      <label>
+        Teléfono (WhatsApp)
+        <input type="text" name="contact_phone" value="{{ site.contact_phone or '' }}" placeholder="+52 55 1234 5678" maxlength="80">
+      </label>
+      <label>
+        Correo
+        <input type="email" name="contact_email" value="{{ site.contact_email or '' }}" placeholder="admisiones@ejemplo.edu.mx" maxlength="255">
+      </label>
+      <label>
+        Dirección
+        <textarea name="contact_address" rows="3" placeholder="Calle, colonia, ciudad...">{{ site.contact_address or '' }}</textarea>
+      </label>
+    </section>
+
+    <div class="form-actions panel">
+      <a class="btn btn-ghost" href="/admin">Cancelar</a>
+      <button class="btn btn-primary" type="submit">Guardar settings</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

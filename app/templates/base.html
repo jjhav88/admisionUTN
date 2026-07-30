@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ app_name }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  {% set site = site if site is defined else none %}
+  <div class="page-shell">
+    {% if user is defined and user %}
+    <header class="topbar">
+      <a class="brand" href="/">
+        {% if site and site.header_logo_url %}
+        <img class="brand-logo" src="{{ site.header_logo_url }}" alt="Logo">
+        {% endif %}
+        <span>{{ (site.header_title if site and site.header_title else app_name) }}</span>
+      </a>
+      <nav class="nav">
+        {% if user.role_name == 'admin' %}
+          <a href="/admin">Panel</a>
+          <a href="/admin/careers">Carreras</a>
+          <a href="/admin/categories">Categorías</a>
+          <a href="/admin/users">Usuarios</a>
+          <a href="/admin/permissions">Permisos</a>
+          <a href="/admin/discounts">Descuentos</a>
+        {% else %}
+          <a href="/specialist">Carreras</a>
+        {% endif %}
+      </nav>
+      <div class="user-chip">
+        <a class="user-chip-link" href="/profile" title="Editar mi perfil">
+          {% if user.avatar_url %}
+          <img class="avatar-circle" src="{{ user.avatar_url }}" alt="Foto de {{ user.full_name or user.username }}">
+          {% else %}
+          <span class="avatar-circle avatar-fallback" aria-hidden="true">
+            {{ (user.full_name or user.username)[0]|upper }}
+          </span>
+          {% endif %}
+          <span>{{ user.full_name or user.username }}</span>
+        </a>
+        <a class="btn btn-ghost" href="/profile">Perfil</a>
+        {% if user.role_name == 'admin' %}
+        <a class="btn btn-ghost" href="/admin/settings">Settings</a>
+        {% endif %}
+        <a class="btn btn-ghost" href="/logout">Salir</a>
+      </div>
+    </header>
+    {% endif %}
+
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% if user is defined and user %}
+    <footer class="site-footer">
+      <div class="site-footer-inner site-footer-grid">
+        <div class="site-footer-logo">
+          {% if site and site.footer_logo_url %}
+          <img class="footer-shield" src="{{ site.footer_logo_url }}" alt="Escudo institucional">
+          {% endif %}
+        </div>
+
+        <div class="site-footer-texts">
+          <p class="site-footer-title">{{ (site.footer_title if site and site.footer_title else "Sistema de Gestión de Información para Admisiones") }}</p>
+          <p class="site-footer-org">{{ (site.footer_org if site and site.footer_org else "Universidad Tominaga Nakamoto") }}</p>
+          <p class="site-footer-copy">{{ (site.footer_copy if site and site.footer_copy else "All Rights Reserved ®") }}</p>
+          <p class="site-footer-dev">Developed by: Ing. Julio Jesús Garcia Coste</p>
+        </div>
+
+        <div class="site-footer-contact">
+          <h3>Contacto</h3>
+          {% if site and (site.contact_phone or site.contact_email or site.contact_address) %}
+            {% if site.contact_phone %}
+            <p>
+              <span class="contact-label">Teléfono / WhatsApp</span>
+              {% if site.whatsapp_url %}
+              <a href="{{ site.whatsapp_url }}" target="_blank" rel="noopener">{{ site.contact_phone }}</a>
+              {% else %}
+              <span>{{ site.contact_phone }}</span>
+              {% endif %}
+            </p>
+            {% endif %}
+            {% if site.contact_email %}
+            <p>
+              <span class="contact-label">Correo</span>
+              <a href="mailto:{{ site.contact_email }}">{{ site.contact_email }}</a>
+            </p>
+            {% endif %}
+            {% if site.contact_address %}
+            <p>
+              <span class="contact-label">Dirección</span>
+              <span>{{ site.contact_address }}</span>
+            </p>
+            {% endif %}
+          {% else %}
+          <p class="site-footer-contact-empty">Sin datos de contacto configurados.</p>
+          {% endif %}
+        </div>
+      </div>
+    </footer>
+    {% endif %}
+  </div>
+
+  <div class="modal confirm-modal" id="app-confirm-modal" aria-hidden="true" role="dialog" aria-labelledby="app-confirm-title">
+    <div class="modal-panel confirm-panel">
+      <p class="eyebrow" id="app-confirm-eyebrow">Confirmación</p>
+      <h2 id="app-confirm-title">¿Continuar?</h2>
+      <p class="confirm-message" id="app-confirm-message"></p>
+      <div class="form-actions confirm-actions">
+        <button type="button" class="btn btn-ghost" id="app-confirm-cancel">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="app-confirm-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Categorías · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section" id="categories-page">
+  <header class="section-head row">
+    <div>
+      <h1>Categorías</h1>
+      <p>Crea, edita, elimina y reordena arrastrando los paneles.</p>
+    </div>
+    <a class="btn btn-primary" href="/admin/categories/new">Nueva categoría</a>
+  </header>
+
+  <form id="category-search-form" class="inline-form panel" novalidate>
+    <label>
+      Buscar
+      <input type="search" name="q" placeholder="Nombre o descripción...">
+    </label>
+  </form>
+
+  <p class="muted drag-hint">Arrastra los paneles para definir el orden de visualización.</p>
+
+  <div id="categories-list" class="category-board">
+    {% for category in categories %}
+    <article class="category-card" draggable="true" data-category-id="{{ category.id }}">
+      <div class="category-card-handle" title="Arrastrar">⋮⋮</div>
+      <div class="category-card-body">
+        <strong>{{ category.name }}</strong>
+        <span class="muted">{{ category.description or "Sin descripción" }}</span>
+        <div class="category-card-meta">
+          <span class="badge">{{ category.field_type_label }}</span>
+          <span class="badge {% if category.is_editable %}badge-ok{% else %}badge-muted{% endif %}">
+            {{ "Editable" if category.is_editable else "No editable" }}
+          </span>
+          {% if category.field_type.value == 'file' or category.allows_document %}
+          <span class="badge">{% if category.field_type.value == 'file' %}Archivo PNG/PDF{% else %}Documento PNG/PDF{% endif %}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn btn-ghost btn-sm" href="/admin/categories/{{ category.id }}/edit">Editar</a>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm btn-danger-text"
+          data-delete-category="{{ category.id }}"
+          data-category-name="{{ category.name }}"
+        >Eliminar</button>
+      </div>
+    </article>
+    {% else %}
+    <p class="empty-state" id="categories-empty">Aún no hay categorías. Crea la primera con “Nueva categoría”.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
