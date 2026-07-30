@@ -1,24 +1,73 @@
-__pycache__/
-*.py[cod]
-*.egg-info/
+# Entornos virtuales
 .venv/
 venv/
+env/
+ENV/
+
+# Secretos y entorno local
 .env
-.env.local
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+*.egg
+.Python
+pip-wheel-metadata/
+
+# Bases de datos locales
 *.db
+*.sqlite
 *.sqlite3
+tests/test_admitomi.db
+admitomi.db
+
+# Uploads de usuarios (logos, avatars, documentos)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
+# Cachés y cobertura
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.cache/
+nosetests.xml
+coverage.xml
+
+# Logs y temporales
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# IDE / SO
 .idea/
 .vscode/
-app/static/uploads/*
-!app/static/uploads/.gitkeep
-htmlcov/
-.coverage
-*.log
+*.swp
+*.swo
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Build / empaquetado
 dist/
 build/
-tests/test_admitomi.db
+*.manifest
+*.spec
+
+# Cursor / herramientas locales
+.cursor/
+agent-transcripts/

@@ -1,94 +1,220 @@
 # AdmiTomi
 
-Sistema web de admisión con FastAPI (MVC/MTV), roles admin/especialista, categorías dinámicas y permisos granulares.
+**Sistema de Gestión de Información para Admisiones** — plataforma web para centralizar, organizar y publicar la información académica de programas educativos, con control de acceso por roles y permisos granulares.
 
-## Stack
+Orientado a equipos de admisión: administración del catálogo (carreras, categorías, descuentos) y consulta/edición controlada por especialistas.
 
-- FastAPI + Jinja2 + CSS/JS
-- SQLAlchemy 2 + SQLite (dev) / PostgreSQL (prod)
-- JWT en cookie HttpOnly + Bearer API
-- Gunicorn + Docker + Render
+---
 
-## Arranque rápido (local)
+## Descripción del sistema
+
+AdmiTomi permite:
+
+- **Administrar carreras** (nivel académico, orden, estado activo).
+- **Definir categorías dinámicas** de información (texto, selección, horarios, archivos, listas, etc.).
+- **Registrar el contenido** de cada carrera por categoría.
+- **Asignar permisos** a especialistas (usuario × carrera × categoría).
+- **Gestionar descuentos** asociados a carrera y categoría.
+- **Personalizar branding** (logo de header, escudo de footer y datos de contacto).
+
+Los **especialistas** consultan un panel con las carreras disponibles y un informe tipo documento; solo pueden editar las categorías para las que tienen permiso.
+
+---
+
+## Roles
+
+| Rol | Capacidad principal |
+|-----|---------------------|
+| **Administrador** | CRUD de usuarios, carreras, categorías, permisos, descuentos y settings del sitio |
+| **Especialista** | Consulta de carreras e informe; edición solo donde tenga permiso |
+
+---
+
+## Stack tecnológico
+
+| Capa | Tecnología |
+|------|------------|
+| Backend | FastAPI |
+| Plantillas / UI | Jinja2 + CSS/JS |
+| ORM / BD | SQLAlchemy 2 · SQLite (dev) / PostgreSQL (prod) |
+| Auth | JWT (cookie HttpOnly + Bearer) |
+| Servidor | Uvicorn / Gunicorn |
+| Contenedores | Docker · Docker Compose |
+| Deploy piloto | Render (`render.yaml`) |
+
+---
+
+## Arquitectura
+
+El proyecto sigue una separación en capas (estilo MVC/MTV):
+
+```text
+┌─────────────────────────────────────────────────────────┐
+│  Cliente (navegador)                                    │
+│  Plantillas Jinja2 · CSS/JS · formularios API           │
+└───────────────────────────┬─────────────────────────────┘
+                            │ HTTP
+┌───────────────────────────▼─────────────────────────────┐
+│  Routers (FastAPI)                                      │
+│  web · auth · admin · specialist · upload               │
+└───────────────────────────┬─────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────┐
+│  Services (lógica de negocio)                           │
+│  Auth · Admin · Specialist · Permissions · Settings     │
+└───────────────────────────┬─────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────┐
+│  Repositories + Models (SQLAlchemy)                     │
+│  User · Career · Category · CareerInfo · Permission …   │
+└───────────────────────────┬─────────────────────────────┘
+                            │
+┌───────────────────────────▼─────────────────────────────┐
+│  Base de datos (SQLite / PostgreSQL)                    │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Capas principales
+
+| Carpeta | Responsabilidad |
+|---------|-----------------|
+| `app/routers/` | Endpoints HTTP y páginas SSR |
+| `app/services/` | Reglas de negocio y orquestación |
+| `app/repositories/` | Acceso a datos |
+| `app/models/` | Entidades SQLAlchemy |
+| `app/schemas/` | Contratos Pydantic (API) |
+| `app/templates/` | Vistas HTML (admin, especialista, auth) |
+| `app/static/` | CSS, JS e imágenes |
+| `app/core/` | Config, seguridad, DB, dependencias |
+| `app/utils/` | Uploads, sanitización HTML |
+
+### Flujo de permisos
+
+```
+Admin asigna permiso
+    → (usuario, carrera, categoría, can_edit)
+        → Especialista ve informe de la carrera
+            → Solo categorías con can_edit muestran “Editar”
+```
+
+### Módulos funcionales
+
+1. **Autenticación** — login, sesión JWT, perfil.
+2. **Carreras** — alta/edición/reordenamiento.
+3. **Categorías** — tipos de campo configurables.
+4. **Información de carrera** — contenido por categoría (admin o especialista).
+5. **Permisos** — asignación y consulta por usuario/carrera.
+6. **Descuentos** — vigencia y vínculo a carrera/categoría.
+7. **Settings** — logos y contacto del sitio (header/footer).
+
+---
+
+## Estructura del repositorio
+
+```
+admitomi/
+├── app/
+│   ├── core/           # config, DB, JWT, dependencias
+│   ├── models/
+│   ├── schemas/
+│   ├── repositories/
+│   ├── services/
+│   ├── routers/
+│   ├── templates/
+│   ├── static/
+│   └── utils/
+├── tests/
+├── alembic/
+├── main.py             # entrada FastAPI
+├── seed.py             # datos iniciales controlados
+├── requirements.txt
+├── requirements-dev.txt
+├── Dockerfile
+├── docker-compose.yml
+├── Procfile
+├── render.yaml
+└── .env.example        # variables de entorno (sin secretos reales)
+```
+
+---
+
+## Arranque local
 
 ```bash
 python -m venv .venv
 # Windows
 .venv\Scripts\activate
-# Linux/macOS
+# Linux / macOS
 source .venv/bin/activate
 
 pip install -r requirements-dev.txt
-copy .env.example .env   # o cp .env.example .env
+cp .env.example .env   # en Windows: copy .env.example .env
 uvicorn main:app --reload
 ```
 
-Abre `http://127.0.0.1:8000`
+Aplicación: `http://127.0.0.1:8000`
 
-### Usuario inicial
+Configura las variables en `.env` a partir de `.env.example` (nunca subas `.env` al repositorio).
 
-| Usuario | Contraseña | Rol |
-|---------|------------|-----|
-| `admin` | valor de `ADMIN_PASSWORD` (por defecto `admin123`) | Administrador |
-
-Cambia `ADMIN_PASSWORD` antes de subir a producción. Los especialistas se crean desde **Admin → Usuarios**.
-
-## Docker
+### Docker
 
 ```bash
 docker compose up --build
 ```
 
-## Pruebas
+### Pruebas
 
 ```bash
-pip install -r requirements-dev.txt
 pytest -q
 ```
 
-## Deploy en Render (piloto)
+---
 
-1. Sube el repo a GitHub.
-2. En [Render](https://render.com): **New → Blueprint** y selecciona este repositorio (`render.yaml`),  
-   o crea un **Web Service** + **PostgreSQL** manualmente.
-3. Variables importantes:
-   - `SECRET_KEY` — aleatorio (≥ 32 caracteres); Render puede generarlo.
-   - `DEBUG=false`
-   - `DATABASE_URL` — la del Postgres de Render.
-   - `ADMIN_PASSWORD` — contraseña inicial del admin (cámbiala).
-   - `CORS_ORIGINS` — URL pública del servicio, ej. `https://admitomi.onrender.com`
-   - `UPLOAD_DIR=/var/data/uploads` — si usas disco persistente.
-4. Healthcheck: `GET /health`
-5. Tras el primer deploy, inicia sesión, cambia la contraseña del admin y configura **Settings** (logos/contacto).
+## Despliegue (piloto)
 
-### Nota sobre archivos
+El repositorio incluye `Procfile` y `render.yaml` para un despliegue tipo **Web Service + PostgreSQL**.
 
-Los uploads (avatars, documentos, logos) viven en disco. En Render el filesystem efímero se pierde en redeploy salvo que montes un **Disk** (incluido en `render.yaml`).
+Requisitos generales de producción:
 
-### Seguridad (piloto)
+- Base de datos PostgreSQL
+- `SECRET_KEY` fuerte y único
+- `DEBUG=false`
+- `CORS_ORIGINS` con la URL pública del servicio
+- Almacenamiento persistente para uploads (disco o equivalente)
 
-- Con `DEBUG=false` se ocultan `/docs` y `/redoc`.
-- No uses `SECRET_KEY` de desarrollo en producción.
-- El panel admin puede mostrar contraseñas recuperables cifradas con `SECRET_KEY`; protege ese secreto.
+Consulta `.env.example` y `render.yaml` para el detalle de variables (sin valores secretos en este documento).
 
-## API (resumen)
+Healthcheck: `GET /health`
 
-- `POST /api/auth/login` — OAuth2 password form
-- `POST /api/auth/login/json` — login JSON
-- `GET /api/auth/me`
-- `/api/admin/...` — CRUD admin
-- `/api/specialist/...` — consulta/edición con permisos
-- `POST /api/upload` — subida de archivos
+---
 
-## Estructura
+## API (vista general)
 
-```
-app/
-  core/ models/ schemas/ repositories/ services/ routers/
-  templates/ static/ utils/
-main.py
-seed.py
-Procfile
-render.yaml
-Dockerfile
-```
+| Área | Prefijo | Uso |
+|------|---------|-----|
+| Auth | `/api/auth` | Login, perfil, avatar |
+| Admin | `/api/admin` | Usuarios, carreras, categorías, permisos, descuentos, settings |
+| Especialista | `/api/specialist` | Carreras e información editable |
+| Upload | `/api/upload` | Archivos (imágenes/documentos) |
+| Web | `/`, `/admin`, `/specialist` | Interfaz HTML |
+
+La documentación interactiva (`/docs`) solo está disponible en modo desarrollo.
+
+---
+
+## Seguridad (principios)
+
+- Contraseñas de acceso almacenadas con hash (bcrypt).
+- Autenticación por JWT.
+- Autorización por rol y permisos finos.
+- Rate limit de login en producción.
+- Variables sensibles solo por entorno (no versionadas).
+
+---
+
+## Licencia / créditos
+
+Desarrollado para **Universidad Tominaga Nakamoto**  
+Sistema de Gestión de Información para Admisiones  
+
+> Este README es informativo y no incluye credenciales, secretos ni datos operativos de administración.
