@@ -17,7 +17,7 @@ from app.services.admin_service import AdminService
 from app.services.auth_service import AuthService
 from app.services.permission_service import PermissionService
 from app.services.site_settings_service import SiteSettingsService
-from app.utils.file_upload import save_avatar, save_branding
+from app.utils.file_upload import restore_upload, save_avatar, save_branding
 
 router = APIRouter(prefix="/api/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
@@ -236,3 +236,13 @@ async def upload_footer_logo(
     """Sube el escudo/logo del footer."""
     url = await save_branding(file)
     return SiteSettingsService(db).set_footer_logo(url)
+
+
+@router.post("/restore-upload")
+async def restore_uploaded_file(
+    relative_path: str = Query(..., description="Ruta relativa, ej. avatars/abc.jpeg"),
+    file: UploadFile = File(...),
+) -> dict[str, str]:
+    """Restaura un archivo local con el mismo nombre (migración de uploads a Render)."""
+    url = await restore_upload(relative_path, file)
+    return {"url": url, "relative_path": relative_path}

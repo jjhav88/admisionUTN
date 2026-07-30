@@ -84,3 +84,31 @@ async def save_branding(file: UploadFile) -> str:
         allowed_extensions=ALLOWED_IMAGE_EXTENSIONS,
         max_size=MAX_AVATAR_SIZE,
     )
+
+
+async def restore_upload(relative_path: str, file: UploadFile) -> str:
+    """Restaura un archivo con el nombre exacto (p. ej. avatars/abc.jpeg).
+
+    Conserva las URLs ya guardadas en la base de datos tras migrar a producción.
+    """
+    ensure_upload_dir()
+    cleaned = relative_path.replace("\\", "/").lstrip("/")
+    if cleaned.startswith("static/uploads/"):
+        cleaned = cleaned[len("static/uploads/") :]
+    if cleaned.startswith("uploads/"):
+        cleaned = cleaned[len("uploads/") :]
+    if not cleaned or ".." in cleaned.split("/"):
+        raise AppError("Ruta de archivo inválida", status_code=400)
+
+    suffix = Path(cleaned).suffix.lower()
+    if suffix not in ALLOWED_EXTENSIONS:
+        raise AppError(f"Extensión no permitida: {suffix or '(sin extensión)'}", status_code=400)
+
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise AppError("El archivo supera el tamaño máximo permitido", status_code=400)
+
+    destination = Path(get_settings().upload_dir) / cleaned
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_bytes(content)
+    return "/static/uploads/" + cleaned

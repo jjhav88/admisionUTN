@@ -71,6 +71,17 @@ async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
 
 
 static_dir = Path(__file__).parent / "app" / "static"
+upload_dir = Path(settings.upload_dir)
+default_uploads = (static_dir / "uploads").resolve()
+# Si UPLOAD_DIR está fuera de app/static/uploads (p. ej. disco /var/data),
+# montarlo en /static/uploads para que las URLs de la BD sigan funcionando.
+if upload_dir.resolve() != default_uploads:
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    app.mount(
+        "/static/uploads",
+        StaticFiles(directory=str(upload_dir)),
+        name="uploads",
+    )
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 app.include_router(auth.router)
