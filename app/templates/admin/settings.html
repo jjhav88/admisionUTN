@@ -72,11 +72,6 @@
         <textarea name="contact_address" rows="3" placeholder="Calle, colonia, ciudad...">{{ site.contact_address or '' }}</textarea>
       </label>
     </section>
-
-    <div class="form-actions panel">
-      <a class="btn btn-ghost" href="/admin">Cancelar</a>
-      <button class="btn btn-primary" type="submit">Guardar settings</button>
-    </div>
   </form>
 
   <section class="panel settings-block settings-careers-photos">
@@ -126,5 +121,10 @@
     <p class="muted">Aún no hay carreras. Créalas en Carreras y vuelve aquí.</p>
     {% endif %}
   </section>
+
+  <div class="form-actions panel settings-form-actions">
+    <a class="btn btn-ghost" href="/admin">Cancelar</a>
+    <button class="btn btn-primary" type="submit" form="settings-form">Guardar settings</button>
+  </div>
 </section>
 {% endblock %}
