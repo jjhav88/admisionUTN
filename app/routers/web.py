@@ -267,13 +267,23 @@ def admin_settings(
     db: Session = Depends(get_db),
     user: User = Depends(require_admin),
 ):
-    """Configuración de header y footer."""
+    """Configuración de header, footer y fotos de carreras."""
     site = SiteSettingsService(db).get_or_create()
+    careers = AdminService(db).list_careers()
     return render(
         request,
         "admin/settings.html",
-        {"user": user, "site": site},
+        {"user": user, "site": site, "careers": careers},
     )
+
+
+@router.get("/ayuda", response_class=HTMLResponse)
+def navigation_guide(
+    request: Request,
+    user: User = Depends(get_current_user),
+):
+    """Mapa de navegación para usuarios no técnicos."""
+    return render(request, "help/guide.html", {"user": user})
 
 
 @router.get("/admin/discounts", response_class=HTMLResponse)

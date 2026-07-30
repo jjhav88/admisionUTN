@@ -46,5 +46,7 @@ class CareerRead(CareerBase):
     id: int
     slug: str
     sort_order: int = 0
+    image_url: str | None = None
+    level_label: str | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None

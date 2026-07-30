@@ -26,24 +26,44 @@
     </article>
   </div>
 
-  <header class="section-head specialist-careers-head">
-    <h2>Carreras disponibles</h2>
-    <p>Selecciona una carrera para ver su información completa.</p>
+  <header class="section-head specialist-careers-head row">
+    <div>
+      <h2>Carreras disponibles</h2>
+      <p>Selecciona una carrera para ver su información completa.</p>
+    </div>
   </header>
 
-  {% if careers %}
-  <div class="specialist-career-grid">
-    {% for career in careers %}
-    <a class="specialist-career-card" href="/specialist/careers/{{ career.id }}">
-      <span class="specialist-career-card-level">{{ career.level_label }}</span>
-      <strong class="specialist-career-card-title">{{ career.name }}</strong>
-      <span class="specialist-career-card-desc">{{ career.description or "Sin descripción" }}</span>
-      <span class="specialist-career-card-cta">Ver información →</span>
-    </a>
-    {% endfor %}
+  <form id="specialist-career-search-form" class="inline-form panel" role="search">
+    <label class="grow">
+      Buscar carrera
+      <input type="search" name="q" placeholder="Nombre o descripción..." autocomplete="off">
+    </label>
+  </form>
+
+  <div id="specialist-career-grid" class="specialist-career-grid">
+    {% if careers %}
+      {% for career in careers %}
+      <a
+        class="specialist-career-card"
+        href="/specialist/careers/{{ career.id }}"
+        data-career-id="{{ career.id }}"
+      >
+        <div class="specialist-career-card-main">
+          <span class="specialist-career-card-level">{{ career.level_label }}</span>
+          <strong class="specialist-career-card-title">{{ career.name }}</strong>
+          <span class="specialist-career-card-desc">{{ career.description or "Sin descripción" }}</span>
+          <span class="specialist-career-card-cta">Ver información →</span>
+        </div>
+        {% if career.image_url %}
+        <img class="specialist-career-card-photo" src="{{ career.image_url }}" alt="">
+        {% else %}
+        <span class="specialist-career-card-photo specialist-career-card-photo-empty" aria-hidden="true"></span>
+        {% endif %}
+      </a>
+      {% endfor %}
+    {% else %}
+    <p class="muted" id="specialist-careers-empty">No hay carreras activas.</p>
+    {% endif %}
   </div>
-  {% else %}
-  <p class="muted">No hay carreras activas.</p>
-  {% endif %}
 </section>
 {% endblock %}

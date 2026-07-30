@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.dependencies import require_admin
 from app.models.user import User, UserRole
-from app.models.career import CareerLevel
+from app.models.career import Career, CareerLevel
 from app.schemas.career import CareerCreate, CareerRead, CareerReorder, CareerUpdate
 from app.schemas.category import CategoryCreate, CategoryRead, CategoryReorder, CategoryUpdate
 from app.schemas.discount import DiscountCreate, DiscountRead, DiscountUpdate
@@ -17,7 +17,7 @@ from app.services.admin_service import AdminService
 from app.services.auth_service import AuthService
 from app.services.permission_service import PermissionService
 from app.services.site_settings_service import SiteSettingsService
-from app.utils.file_upload import restore_upload, save_avatar, save_branding
+from app.utils.file_upload import restore_upload, save_avatar, save_branding, save_career_image
 
 router = APIRouter(prefix="/api/admin", tags=["admin"], dependencies=[Depends(require_admin)])
 
@@ -115,6 +115,17 @@ def update_career(career_id: int, payload: CareerUpdate, db: Session = Depends(g
 def delete_career(career_id: int, db: Session = Depends(get_db)) -> None:
     """Elimina una carrera."""
     AdminService(db).delete_career(career_id)
+
+
+@router.post("/careers/{career_id}/image", response_model=CareerRead)
+async def upload_career_image(
+    career_id: int,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+) -> Career:
+    """Sube la foto circular de una carrera (panel especialista)."""
+    url = await save_career_image(file)
+    return AdminService(db).set_career_image(career_id, url)
 
 
 # --- Categories ---

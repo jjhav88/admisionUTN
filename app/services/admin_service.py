@@ -80,6 +80,12 @@ class AdminService:
         """Reordena carreras según la secuencia de IDs."""
         return self.careers.reorder(ordered_ids)
 
+    def set_career_image(self, career_id: int, image_url: str) -> Career:
+        """Asigna la foto circular mostrada en el panel del especialista."""
+        career = self.get_career(career_id)
+        career.image_url = image_url
+        return self.careers.save(career)
+
     # --- Categories ---
     def list_categories(self, search: str | None = None) -> list[Category]:
         return self.categories.list_all(search=search)

@@ -25,6 +25,8 @@ def ensure_schema(engine: Engine) -> None:
             statements.append(
                 "ALTER TABLE careers ADD COLUMN level VARCHAR(50) DEFAULT 'licenciatura'"
             )
+        if "image_url" not in career_cols:
+            statements.append("ALTER TABLE careers ADD COLUMN image_url VARCHAR(500)")
 
     if "categories" in tables:
         category_cols = {col["name"] for col in inspector.get_columns("categories")}

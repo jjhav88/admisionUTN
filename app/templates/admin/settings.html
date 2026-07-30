@@ -78,5 +78,53 @@
       <button class="btn btn-primary" type="submit">Guardar settings</button>
     </div>
   </form>
+
+  <section class="panel settings-block settings-careers-photos">
+    <h2>Fotos de carreras (panel especialista)</h2>
+    <p class="muted form-hint">
+      Estas imágenes circulares se muestran a la derecha de cada tarjeta en “Carreras disponibles”.
+      Se guardan al elegir el archivo.
+    </p>
+    {% if careers %}
+    <div class="career-photo-list">
+      {% for career in careers %}
+      <div class="career-photo-row" data-career-id="{{ career.id }}">
+        {% if career.image_url %}
+        <img
+          class="career-photo-preview"
+          id="career-photo-{{ career.id }}"
+          src="{{ career.image_url }}"
+          alt="Foto {{ career.name }}"
+        >
+        {% else %}
+        <img
+          class="career-photo-preview"
+          id="career-photo-{{ career.id }}"
+          src=""
+          alt=""
+          hidden
+        >
+        <span class="career-photo-fallback" id="career-photo-fallback-{{ career.id }}">Sin foto</span>
+        {% endif %}
+        <div class="career-photo-meta">
+          <strong>{{ career.name }}</strong>
+          <span class="muted">{{ career.level_label }}</span>
+          <label class="upload-field">
+            Foto circular
+            <input
+              type="file"
+              accept=".png,.jpg,.jpeg,.webp,.gif,image/*"
+              data-career-image="{{ career.id }}"
+            >
+            <small class="muted">PNG, JPG o WEBP. Máx. 5 MB.</small>
+          </label>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="muted">Aún no hay carreras. Créalas en Carreras y vuelve aquí.</p>
+    {% endif %}
+  </section>
 </section>
 {% endblock %}

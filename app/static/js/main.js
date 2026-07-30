@@ -995,6 +995,109 @@ function initSettingsForm() {
     e.preventDefault();
     handleSettingsForm(form);
   });
+
+  initCareerPhotoUploads();
+}
+
+async function uploadCareerPhoto(careerId, file, input) {
+  const data = new FormData();
+  data.append("file", file);
+  try {
+    const career = await apiRequest(`/api/admin/careers/${careerId}/image`, {
+      method: "POST",
+      body: data,
+    });
+    const preview = document.getElementById(`career-photo-${careerId}`);
+    const fallback = document.getElementById(`career-photo-fallback-${careerId}`);
+    if (preview && career.image_url) {
+      preview.src = career.image_url;
+      preview.hidden = false;
+      preview.alt = `Foto ${career.name || ""}`;
+    }
+    if (fallback) fallback.hidden = true;
+    notify(`Foto de ${career.name || "carrera"} actualizada`, "ok");
+    input.value = "";
+  } catch (err) {
+    notify(err.message, "error");
+  }
+}
+
+function initCareerPhotoUploads() {
+  document.querySelectorAll("[data-career-image]").forEach((input) => {
+    input.addEventListener("change", () => {
+      const file = input.files?.[0];
+      const careerId = Number(input.dataset.careerImage);
+      if (!file || !careerId) return;
+      uploadCareerPhoto(careerId, file, input);
+    });
+  });
+}
+
+function renderSpecialistCareerCards(careers) {
+  if (!careers.length) {
+    return `<p class="muted" id="specialist-careers-empty">No hay carreras que coincidan con tu búsqueda.</p>`;
+  }
+  return careers
+    .map((c) => {
+      const photo = c.image_url
+        ? `<img class="specialist-career-card-photo" src="${escapeHtml(c.image_url)}" alt="">`
+        : `<span class="specialist-career-card-photo specialist-career-card-photo-empty" aria-hidden="true"></span>`;
+      return `
+    <a class="specialist-career-card" href="/specialist/careers/${c.id}" data-career-id="${c.id}">
+      <div class="specialist-career-card-main">
+        <span class="specialist-career-card-level">${escapeHtml(c.level_label || careerLevelLabel(c.level))}</span>
+        <strong class="specialist-career-card-title">${escapeHtml(c.name)}</strong>
+        <span class="specialist-career-card-desc">${escapeHtml(c.description || "Sin descripción")}</span>
+        <span class="specialist-career-card-cta">Ver información →</span>
+      </div>
+      ${photo}
+    </a>`;
+    })
+    .join("");
+}
+
+async function reloadSpecialistCareers() {
+  const grid = document.getElementById("specialist-career-grid");
+  const form = document.getElementById("specialist-career-search-form");
+  if (!grid) return;
+
+  const params = new URLSearchParams();
+  if (form?.q?.value.trim()) params.set("q", form.q.value.trim());
+  const query = params.toString() ? `?${params.toString()}` : "";
+
+  try {
+    const careers = await api.get(`/api/specialist/careers${query}`);
+    grid.innerHTML = renderSpecialistCareerCards(careers);
+  } catch (err) {
+    notify(err.message, "error");
+  }
+}
+
+function initSpecialistCareerSearch() {
+  const form = document.getElementById("specialist-career-search-form");
+  if (!form) return;
+  bindLiveSearch(form, reloadSpecialistCareers);
+}
+
+function initReportSearch() {
+  const input = document.getElementById("report-search-input");
+  if (!input) return;
+  const empty = document.getElementById("report-search-empty");
+  const sections = [...document.querySelectorAll(".report-section[data-search-text]")];
+
+  const apply = () => {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    sections.forEach((section) => {
+      const hay = (section.dataset.searchText || "").toLowerCase();
+      const show = !q || hay.includes(q);
+      section.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (empty) empty.hidden = visible > 0 || !q;
+  };
+
+  input.addEventListener("input", debounce(apply, 200));
 }
 
 async function handlePermissionForm(form) {
@@ -1912,6 +2015,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   initPermissionCareerCheckboxes();
   initSettingsForm();
+  initSpecialistCareerSearch();
+  initReportSearch();
 
   const discountForm = document.getElementById("discount-form");
   discountForm?.addEventListener("submit", (e) => {

@@ -22,6 +22,7 @@ def ensure_upload_dir() -> Path:
     (path / "avatars").mkdir(parents=True, exist_ok=True)
     (path / "documents").mkdir(parents=True, exist_ok=True)
     (path / "branding").mkdir(parents=True, exist_ok=True)
+    (path / "careers").mkdir(parents=True, exist_ok=True)
     return path
 
 
@@ -81,6 +82,16 @@ async def save_branding(file: UploadFile) -> str:
     return await save_upload(
         file,
         subfolder="branding",
+        allowed_extensions=ALLOWED_IMAGE_EXTENSIONS,
+        max_size=MAX_AVATAR_SIZE,
+    )
+
+
+async def save_career_image(file: UploadFile) -> str:
+    """Guarda foto circular de carrera en static/uploads/careers/."""
+    return await save_upload(
+        file,
+        subfolder="careers",
         allowed_extensions=ALLOWED_IMAGE_EXTENSIONS,
         max_size=MAX_AVATAR_SIZE,
     )

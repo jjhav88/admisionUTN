@@ -20,11 +20,24 @@
         <span>{{ detail.categories | length }} categorías</span>
         <span>{{ editable_count }} con permiso de edición</span>
       </div>
+      <label class="report-search">
+        Buscar en este informe
+        <input
+          id="report-search-input"
+          type="search"
+          placeholder="Escribe una categoría o palabra..."
+          autocomplete="off"
+        >
+      </label>
+      <p id="report-search-empty" class="report-empty" hidden>No hay secciones que coincidan con tu búsqueda.</p>
     </header>
 
     <div class="report-body">
       {% for item in detail.categories %}
-      <section class="report-section">
+      <section
+        class="report-section"
+        data-search-text="{{ (item.category_name ~ ' ' ~ (item.content or '') ~ ' ' ~ ((item.selected_values or []) | join(' '))) | e }}"
+      >
         <div class="report-section-head">
           <h2>{{ item.category_name }}</h2>
           <div class="report-section-actions">
