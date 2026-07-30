@@ -1,6 +1,6 @@
 databases:
   - name: admitomi-db
-    plan: free
+    plan: basic-256mb
     databaseName: admitomi
     user: admitomi
 
@@ -8,11 +8,15 @@ services:
   - type: web
     name: admitomi
     runtime: python
-    plan: free
+    plan: starter
     region: oregon
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn main:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:$PORT --workers 2
     healthCheckPath: /health
+    disk:
+      name: admitomi-uploads
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.8"
@@ -37,6 +41,6 @@ services:
       - key: CORS_ORIGINS
         sync: false
       - key: UPLOAD_DIR
-        value: app/static/uploads
+        value: /var/data/uploads
       - key: SEED_CLEANUP_TESTS
         value: "false"
