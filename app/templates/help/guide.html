@@ -1,57 +1,207 @@
 {% extends "base.html" %}
 {% block title %}Mapa de navegación · {{ app_name }}{% endblock %}
 {% block content %}
-<section class="section narrow guide-page">
+<section class="section guide-page">
   <header class="section-head">
     <h1>Mapa de navegación</h1>
-    <p>Guía rápida para moverte por el sistema. No necesitas conocimientos técnicos.</p>
+    <p>Guía visual para moverte por el sistema. Sigue las flechas: es el mismo recorrido que harás en la app.</p>
   </header>
 
-  <article class="panel guide-block">
-    <h2>Barra superior</h2>
-    <ul class="guide-list">
-      <li><strong>Logo / nombre</strong> — vuelve al inicio de tu panel.</li>
-      <li><strong>Carreras</strong> (especialista) — lista de programas disponibles.</li>
-      <li><strong>Perfil</strong> — cambia tu nombre, correo o foto.</li>
-      <li><strong>Salir</strong> — cierra tu sesión de forma segura.</li>
-      <li><strong>¿Cómo navegar?</strong> — esta guía (siempre visible arriba).</li>
-    </ul>
-  </article>
-
   {% if user.role_name == 'specialist' %}
-  <article class="panel guide-block">
-    <h2>Si eres especialista</h2>
-    <ol class="guide-list numbered">
-      <li>En <strong>Carreras</strong> verás las tarjetas de cada programa.</li>
-      <li>Usa la <strong>barra de búsqueda</strong> para filtrar por nombre.</li>
-      <li>Haz clic en <strong>Ver información</strong> para abrir el informe completo.</li>
-      <li>Dentro del informe, busca por categoría con la caja <strong>Buscar en este informe</strong>.</li>
-      <li>Si tienes permiso, verás el botón <strong>Editar</strong> junto a esa sección; si no, dirá “Sin permiso de edición”.</li>
-      <li>La <strong>X</strong> arriba a la derecha cierra el informe y vuelve a las carreras.</li>
-    </ol>
+  <article class="panel guide-diagram-panel">
+    <div class="guide-diagram-head">
+      <span class="guide-diagram-eyebrow">Tu recorrido</span>
+      <h2>Diagrama del especialista</h2>
+    </div>
+
+    <div class="nav-flow" aria-label="Diagrama de navegación del especialista">
+      <div class="nav-flow-row">
+        <div class="nav-node nav-node-start">
+          <span class="nav-node-step">1</span>
+          <strong>Inicio de sesión</strong>
+          <small>Entras con tu usuario y contraseña</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row">
+        <div class="nav-node nav-node-accent">
+          <span class="nav-node-step">2</span>
+          <strong>Panel · Carreras</strong>
+          <small>Tarjetas de programas + barra de búsqueda</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row nav-flow-row-split">
+        <div class="nav-node">
+          <span class="nav-node-step">3a</span>
+          <strong>Buscar carrera</strong>
+          <small>Filtra por nombre o descripción</small>
+        </div>
+        <div class="nav-node">
+          <span class="nav-node-step">3b</span>
+          <strong>Abrir carrera</strong>
+          <small>Clic en “Ver información →”</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row">
+        <div class="nav-node nav-node-wide">
+          <span class="nav-node-step">4</span>
+          <strong>Informe de la carrera</strong>
+          <small>Aquí ves todas las categorías (como un documento)</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row nav-flow-row-split">
+        <div class="nav-node">
+          <span class="nav-node-step">5a</span>
+          <strong>Buscar en el informe</strong>
+          <small>Encuentra una categoría o palabra</small>
+        </div>
+        <div class="nav-node nav-node-ok">
+          <span class="nav-node-step">5b</span>
+          <strong>Editar (si tienes permiso)</strong>
+          <small>Botón “Editar” · luego Guardar</small>
+        </div>
+        <div class="nav-node">
+          <span class="nav-node-step">5c</span>
+          <strong>Cerrar (X)</strong>
+          <small>Vuelves a la lista de carreras</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-flow-legend">
+      <span><i class="legend-dot legend-dot-accent"></i> Pantalla principal</span>
+      <span><i class="legend-dot legend-dot-ok"></i> Acción con permiso</span>
+      <span><i class="legend-dot"></i> Paso opcional / auxiliar</span>
+    </div>
   </article>
   {% else %}
-  <article class="panel guide-block">
-    <h2>Si eres administrador</h2>
-    <ul class="guide-list">
-      <li><strong>Panel</strong> — resumen general.</li>
-      <li><strong>Carreras / Categorías</strong> — catálogo académico.</li>
-      <li><strong>Usuarios</strong> — altas de especialistas y fotos de perfil.</li>
-      <li><strong>Permisos</strong> — qué puede editar cada especialista.</li>
-      <li><strong>Descuentos</strong> — promociones por carrera.</li>
-      <li><strong>Settings</strong> — logos, contacto y <strong>fotos de las tarjetas de carrera</strong>.</li>
-    </ul>
+  <article class="panel guide-diagram-panel">
+    <div class="guide-diagram-head">
+      <span class="guide-diagram-eyebrow">Tu recorrido</span>
+      <h2>Diagrama del administrador</h2>
+    </div>
+
+    <div class="nav-flow" aria-label="Diagrama de navegación del administrador">
+      <div class="nav-flow-row">
+        <div class="nav-node nav-node-start">
+          <span class="nav-node-step">1</span>
+          <strong>Inicio de sesión</strong>
+          <small>Acceso como administrador</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row">
+        <div class="nav-node nav-node-accent">
+          <span class="nav-node-step">2</span>
+          <strong>Panel principal</strong>
+          <small>Resumen y acceso a cada módulo</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row nav-flow-row-admin">
+        <div class="nav-node">
+          <span class="nav-node-step">A</span>
+          <strong>Carreras</strong>
+          <small>Programas académicos</small>
+        </div>
+        <div class="nav-node">
+          <span class="nav-node-step">B</span>
+          <strong>Categorías</strong>
+          <small>Tipos de información</small>
+        </div>
+        <div class="nav-node">
+          <span class="nav-node-step">C</span>
+          <strong>Usuarios</strong>
+          <small>Especialistas y perfiles</small>
+        </div>
+        <div class="nav-node">
+          <span class="nav-node-step">D</span>
+          <strong>Permisos</strong>
+          <small>Quién puede editar qué</small>
+        </div>
+        <div class="nav-node">
+          <span class="nav-node-step">E</span>
+          <strong>Descuentos</strong>
+          <small>Promociones</small>
+        </div>
+        <div class="nav-node nav-node-ok">
+          <span class="nav-node-step">F</span>
+          <strong>Settings</strong>
+          <small>Logos, contacto y fotos de tarjetas</small>
+        </div>
+      </div>
+      <div class="nav-flow-arrow" aria-hidden="true"></div>
+      <div class="nav-flow-row">
+        <div class="nav-node nav-node-wide">
+          <span class="nav-node-step">3</span>
+          <strong>Resultado</strong>
+          <small>Los especialistas ven carreras, informes y solo editan donde les diste permiso</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-flow-legend">
+      <span><i class="legend-dot legend-dot-accent"></i> Punto de partida</span>
+      <span><i class="legend-dot legend-dot-ok"></i> Configuración visual del sitio</span>
+      <span><i class="legend-dot"></i> Módulos del menú superior</span>
+    </div>
   </article>
   {% endif %}
 
-  <article class="panel guide-block">
-    <h2>Consejos</h2>
-    <ul class="guide-list">
-      <li>Si no ves un botón de editar, es porque aún no te asignaron permiso para esa categoría.</li>
-      <li>Los cambios se guardan al pulsar <strong>Guardar</strong> en cada formulario.</li>
-      <li>Si algo no carga, prueba refrescar la página (F5) o vuelve a entrar con tu usuario.</li>
-    </ul>
-  </article>
+  <div class="guide-grid">
+    <article class="panel guide-block">
+      <h2>Barra superior</h2>
+      <ul class="guide-list">
+        <li><strong>Logo / nombre</strong> — vuelve al inicio de tu panel.</li>
+        {% if user.role_name == 'specialist' %}
+        <li><strong>Carreras</strong> — lista de programas disponibles.</li>
+        {% else %}
+        <li><strong>Panel, Carreras, Categorías…</strong> — cada enlace abre un módulo.</li>
+        {% endif %}
+        <li><strong>Perfil</strong> — cambia tu nombre, correo o foto.</li>
+        <li><strong>Salir</strong> — cierra tu sesión de forma segura.</li>
+        <li><strong>¿Cómo navegar?</strong> — esta guía (siempre visible arriba).</li>
+      </ul>
+    </article>
+
+    {% if user.role_name == 'specialist' %}
+    <article class="panel guide-block">
+      <h2>Pasos en palabras simples</h2>
+      <ol class="guide-list numbered">
+        <li>En <strong>Carreras</strong> verás las tarjetas de cada programa.</li>
+        <li>Usa la <strong>barra de búsqueda</strong> para filtrar por nombre.</li>
+        <li>Haz clic en <strong>Ver información</strong> para abrir el informe.</li>
+        <li>Dentro del informe, busca con <strong>Buscar en este informe</strong>.</li>
+        <li>Si tienes permiso, usa <strong>Editar</strong>; si no, verás “Sin permiso de edición”.</li>
+        <li>La <strong>X</strong> cierra el informe y vuelve a las carreras.</li>
+      </ol>
+    </article>
+    {% else %}
+    <article class="panel guide-block">
+      <h2>Qué hace cada módulo</h2>
+      <ul class="guide-list">
+        <li><strong>Panel</strong> — resumen general.</li>
+        <li><strong>Carreras / Categorías</strong> — catálogo académico.</li>
+        <li><strong>Usuarios</strong> — altas de especialistas y fotos.</li>
+        <li><strong>Permisos</strong> — qué puede editar cada especialista.</li>
+        <li><strong>Descuentos</strong> — promociones por carrera.</li>
+        <li><strong>Settings</strong> — logos, contacto y fotos de las tarjetas.</li>
+      </ul>
+    </article>
+    {% endif %}
+
+    <article class="panel guide-block guide-block-tips">
+      <h2>Consejos</h2>
+      <ul class="guide-list">
+        <li>Si no ves “Editar”, aún no te asignaron permiso para esa categoría.</li>
+        <li>Los cambios se guardan al pulsar <strong>Guardar</strong>.</li>
+        <li>Si algo no carga, refresca (F5) o vuelve a entrar.</li>
+      </ul>
+    </article>
+  </div>
 
   <p class="guide-back">
     {% if user.role_name == 'admin' %}
