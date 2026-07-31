@@ -56,7 +56,7 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def validate_production_secrets(self):
-        """En producción exige SECRET_KEY fuerte."""
+        """En producción exige SECRET_KEY fuerte y normaliza rutas de upload."""
         if not self.debug and self.secret_key.strip() in INSECURE_SECRET_KEYS:
             raise ValueError(
                 "SECRET_KEY inseguro para producción. Define un valor aleatorio largo "
@@ -64,6 +64,11 @@ class Settings(BaseSettings):
             )
         if not self.debug and len(self.secret_key.strip()) < 32:
             raise ValueError("SECRET_KEY debe tener al menos 32 caracteres en producción.")
+
+        upload_path = Path(self.upload_dir)
+        if not upload_path.is_absolute():
+            upload_path = BASE_DIR / upload_path
+        self.upload_dir = str(upload_path.resolve())
         return self
 
 

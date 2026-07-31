@@ -56,7 +56,13 @@
           <span class="specialist-career-card-cta">Ver información →</span>
         </div>
         {% if career.image_url %}
-        <img class="specialist-career-card-photo" src="{{ career.image_url }}" alt="">
+        <img
+          class="specialist-career-card-photo"
+          src="{{ career.image_url }}"
+          alt=""
+          loading="lazy"
+          onerror="this.classList.add('specialist-career-card-photo-empty'); this.removeAttribute('src');"
+        >
         {% else %}
         <span class="specialist-career-card-photo specialist-career-card-photo-empty" aria-hidden="true"></span>
         {% endif %}

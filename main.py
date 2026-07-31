@@ -108,17 +108,20 @@ async def starlette_http_exception_handler(request: Request, exc: StarletteHTTPE
 
 
 static_dir = Path(__file__).parent / "app" / "static"
-upload_dir = Path(settings.upload_dir)
-default_uploads = (static_dir / "uploads").resolve()
-# Si UPLOAD_DIR está fuera de app/static/uploads (p. ej. disco /var/data),
-# montarlo en /static/uploads para que las URLs de la BD sigan funcionando.
-if upload_dir.resolve() != default_uploads:
-    upload_dir.mkdir(parents=True, exist_ok=True)
-    app.mount(
-        "/static/uploads",
-        StaticFiles(directory=str(upload_dir)),
-        name="uploads",
-    )
+# Siempre servir UPLOAD_DIR en /static/uploads (disco Render o carpeta local).
+# Debe montarse ANTES de /static para que no se sirva una carpeta uploads vacía.
+upload_dir = Path(settings.upload_dir).resolve()
+upload_dir.mkdir(parents=True, exist_ok=True)
+(upload_dir / "avatars").mkdir(exist_ok=True)
+(upload_dir / "documents").mkdir(exist_ok=True)
+(upload_dir / "branding").mkdir(exist_ok=True)
+(upload_dir / "careers").mkdir(exist_ok=True)
+logger.info("UPLOAD_DIR=%s", upload_dir)
+app.mount(
+    "/static/uploads",
+    StaticFiles(directory=str(upload_dir)),
+    name="uploads",
+)
 app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 app.include_router(auth.router)

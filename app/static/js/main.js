@@ -1050,7 +1050,7 @@ function renderSpecialistCareerCards(careers) {
   return careers
     .map((c) => {
       const photo = c.image_url
-        ? `<img class="specialist-career-card-photo" src="${escapeHtml(c.image_url)}" alt="">`
+        ? `<img class="specialist-career-card-photo" src="${escapeHtml(c.image_url)}" alt="" loading="lazy" onerror="this.classList.add('specialist-career-card-photo-empty'); this.removeAttribute('src');">`
         : `<span class="specialist-career-card-photo specialist-career-card-photo-empty" aria-hidden="true"></span>`;
       return `
     <a class="specialist-career-card" href="/specialist/careers/${c.id}" data-career-id="${c.id}">
