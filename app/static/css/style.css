@@ -2132,14 +2132,14 @@ body.report-view .main {
 
 .discount-flip-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.35rem;
 }
 
 .discount-flip {
   display: block;
   width: 100%;
-  height: 240px;
+  height: 360px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -2167,8 +2167,8 @@ body.report-view .main {
   inset: 0;
   display: grid;
   align-content: start;
-  gap: 0.55rem;
-  padding: 1.25rem 1.3rem;
+  gap: 0.75rem;
+  padding: 1.6rem 1.5rem;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   backface-visibility: hidden;
@@ -2193,18 +2193,18 @@ body.report-view .main {
 .discount-flip-badge {
   display: inline-flex;
   width: fit-content;
-  padding: 0.35rem 0.7rem;
+  padding: 0.45rem 0.85rem;
   border-radius: 999px;
   background: rgba(255, 102, 0, 0.2);
   color: var(--orange-2);
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.45rem;
   font-weight: 700;
 }
 
 .discount-flip-title {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: 1.45rem;
   line-height: 1.25;
   color: var(--text);
 }
@@ -2255,12 +2255,6 @@ body.report-view .main {
   font-weight: 600;
 }
 
-@media (max-width: 960px) {
-  .discount-flip-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 760px) {
   .topbar { flex-wrap: wrap; }
   .section-head.row { flex-direction: column; align-items: stretch; }
@@ -2269,6 +2263,9 @@ body.report-view .main {
   .user-chip { width: 100%; justify-content: space-between; }
   .discount-flip-grid {
     grid-template-columns: 1fr;
+  }
+  .discount-flip {
+    height: 320px;
   }
   .site-footer-grid {
     grid-template-columns: 1fr;
