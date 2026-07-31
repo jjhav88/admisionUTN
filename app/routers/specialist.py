@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.dependencies import require_specialist_or_admin
+from app.models.career import CareerLevel
 from app.models.user import User
 from app.schemas.career import CareerRead
 from app.schemas.career_info import CareerDetailRead, CareerInfoGrouped, CareerInfoRead, CareerInfoUpdate
@@ -22,10 +23,11 @@ router = APIRouter(
 def list_careers(
     q: str | None = Query(default=None, description="Filtro por nombre"),
     active_only: bool = Query(default=True),
+    level: CareerLevel | None = Query(default=None, description="Filtrar por nivel académico"),
     db: Session = Depends(get_db),
 ):
     """Lista carreras disponibles, con filtros opcionales."""
-    return SpecialistService(db).list_careers(q=q, active_only=active_only)
+    return SpecialistService(db).list_careers(q=q, active_only=active_only, level=level)
 
 
 @router.get("/careers/{career_id}/info", response_model=CareerDetailRead)

@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
-from app.models.career import Career
+from app.models.career import Career, CareerLevel
 from app.models.career_info import CareerInfo
 from app.models.discount import Discount
 from app.models.user import User
@@ -26,9 +26,14 @@ class SpecialistService:
         self.discounts = DiscountRepository(db)
         self.permissions = PermissionService(db)
 
-    def list_careers(self, q: str | None = None, active_only: bool = True) -> list[Career]:
-        """Lista carreras con filtro opcional por nombre."""
-        return self.careers.list_all(active_only=active_only, search=q)
+    def list_careers(
+        self,
+        q: str | None = None,
+        active_only: bool = True,
+        level: CareerLevel | None = None,
+    ) -> list[Career]:
+        """Lista carreras con filtro opcional por nombre y nivel académico."""
+        return self.careers.list_all(active_only=active_only, search=q, level=level)
 
     def dashboard_summary(self, user: User) -> dict:
         """Resumen de métricas para el panel del especialista."""
@@ -84,11 +89,13 @@ class SpecialistService:
                 )
             )
 
+        level_value = career.level.value if hasattr(career.level, "value") else str(career.level)
         return CareerDetailRead(
             id=career.id,
             name=career.name,
             slug=career.slug,
             description=career.description,
+            level=level_value,
             categories=grouped,
         )
 

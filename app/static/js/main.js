@@ -181,7 +181,7 @@ async function handleLoginForm(form) {
     setToken(data.access_token);
     notify("Bienvenido", "ok");
     const me = await api.get("/api/auth/me");
-    window.location.href = me.role === "admin" ? "/admin" : "/specialist";
+    window.location.href = me.role === "admin" ? "/admin" : "/specialist?level=licenciatura";
   } catch (err) {
     notify(err.message || "Credenciales inválidas", "error");
     const box = document.getElementById("login-error");
@@ -1073,6 +1073,7 @@ async function reloadSpecialistCareers() {
 
   const params = new URLSearchParams();
   if (form?.q?.value.trim()) params.set("q", form.q.value.trim());
+  if (form?.level?.value) params.set("level", form.level.value);
   const query = params.toString() ? `?${params.toString()}` : "";
 
   try {

@@ -26,8 +26,8 @@
       <div class="nav-flow-row">
         <div class="nav-node nav-node-accent">
           <span class="nav-node-step">2</span>
-          <strong>Panel · Carreras</strong>
-          <small>Tarjetas de programas + barra de búsqueda</small>
+          <strong>Menú por nivel</strong>
+          <small>Licenciatura · Maestrías · Preparatoria · Posgrado</small>
         </div>
       </div>
       <div class="nav-flow-arrow" aria-hidden="true"></div>
@@ -157,7 +157,7 @@
       <ul class="guide-list">
         <li><strong>Logo / nombre</strong> — vuelve al inicio de tu panel.</li>
         {% if user.role_name == 'specialist' %}
-        <li><strong>Carreras</strong> — lista de programas disponibles.</li>
+        <li><strong>Licenciatura / Maestrías / Preparatoria / Posgrado</strong> — filtra las tarjetas por nivel.</li>
         {% else %}
         <li><strong>Panel, Carreras, Categorías…</strong> — cada enlace abre un módulo.</li>
         {% endif %}
@@ -171,8 +171,8 @@
     <article class="panel guide-block">
       <h2>Pasos en palabras simples</h2>
       <ol class="guide-list numbered">
-        <li>En <strong>Carreras</strong> verás las tarjetas de cada programa.</li>
-        <li>Usa la <strong>barra de búsqueda</strong> para filtrar por nombre.</li>
+        <li>Elige un <strong>nivel</strong> en el menú (por ejemplo Licenciatura).</li>
+        <li>Usa la <strong>barra de búsqueda</strong> para filtrar por nombre dentro de ese nivel.</li>
         <li>Haz clic en <strong>Ver información</strong> para abrir el informe.</li>
         <li>Dentro del informe, busca con <strong>Buscar en este informe</strong>.</li>
         <li>Si tienes permiso, usa <strong>Editar</strong>; si no, verás “Sin permiso de edición”.</li>
@@ -207,7 +207,7 @@
     {% if user.role_name == 'admin' %}
     <a class="btn btn-primary" href="/admin">Volver al panel</a>
     {% else %}
-    <a class="btn btn-primary" href="/specialist">Volver a carreras</a>
+    <a class="btn btn-primary" href="/specialist?level=licenciatura">Volver a licenciaturas</a>
     {% endif %}
   </p>
 </section>

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Especialista · {{ app_name }}{% endblock %}
+{% block title %}{{ section_title }} · {{ app_name }}{% endblock %}
 {% block content %}
 <section class="section specialist-dashboard">
   <header class="section-head">
-    <h1>Panel especialista</h1>
-    <p>Resumen de tu acceso y carreras disponibles para consulta o edición.</p>
+    <h1>{{ section_title }}</h1>
+    <p>{{ section_lead }}</p>
   </header>
 
   <div class="stat-grid">
     <article class="stat">
-      <span class="stat-label">Carreras</span>
-      <strong>{{ careers_count }}</strong>
+      <span class="stat-label">En este nivel</span>
+      <strong>{{ careers | length }}</strong>
     </article>
     <article class="stat">
       <span class="stat-label">Con permiso de edición</span>
@@ -28,14 +28,15 @@
 
   <header class="section-head specialist-careers-head row">
     <div>
-      <h2>Carreras disponibles</h2>
-      <p>Selecciona una carrera para ver su información completa.</p>
+      <h2>Programas disponibles</h2>
+      <p>Selecciona un programa para ver su información completa.</p>
     </div>
   </header>
 
   <form id="specialist-career-search-form" class="inline-form panel" role="search">
+    <input type="hidden" name="level" value="{{ active_level }}">
     <label class="grow">
-      Buscar carrera
+      Buscar
       <input type="search" name="q" placeholder="Nombre o descripción..." autocomplete="off">
     </label>
   </form>
@@ -62,7 +63,7 @@
       </a>
       {% endfor %}
     {% else %}
-    <p class="muted" id="specialist-careers-empty">No hay carreras activas.</p>
+    <p class="muted" id="specialist-careers-empty">Aún no hay programas en este nivel.</p>
     {% endif %}
   </div>
 </section>

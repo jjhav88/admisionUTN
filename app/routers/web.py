@@ -39,11 +39,30 @@ def render(request: Request, name: str, context: dict | None = None, status_code
     return templates.TemplateResponse(request, name, data, status_code=status_code)
 
 
+# Menú del especialista: valor de enum → etiqueta en la barra
+SPECIALIST_LEVEL_NAV = (
+    (CareerLevel.LICENCIATURA, "Licenciatura"),
+    (CareerLevel.MAESTRIA, "Maestrías"),
+    (CareerLevel.PREPARATORIA, "Preparatoria"),
+    (CareerLevel.CURSO_POSGRADO, "Posgrado"),
+)
+
+SPECIALIST_LEVEL_TITLES = {
+    CareerLevel.LICENCIATURA: ("Licenciaturas", "Programas de licenciatura disponibles."),
+    CareerLevel.MAESTRIA: ("Maestrías", "Programas de maestría disponibles."),
+    CareerLevel.PREPARATORIA: ("Preparatoria", "Programas de preparatoria disponibles."),
+    CareerLevel.CURSO_POSGRADO: ("Posgrado", "Cursos de posgrado disponibles."),
+}
+
+
 def _redirect_home(user: User) -> RedirectResponse:
     """Redirige al dashboard según rol."""
     if user.role_name == UserRole.ADMIN.value:
         return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
-    return RedirectResponse(url="/specialist", status_code=status.HTTP_303_SEE_OTHER)
+    return RedirectResponse(
+        url="/specialist?level=licenciatura",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -348,20 +367,31 @@ def admin_discount_edit(
 @router.get("/specialist", response_class=HTMLResponse)
 def specialist_dashboard(
     request: Request,
+    level: CareerLevel | None = None,
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ):
-    """Dashboard del especialista."""
+    """Dashboard del especialista filtrado por nivel académico."""
     if user.role_name == UserRole.ADMIN.value:
         return RedirectResponse(url="/admin", status_code=status.HTTP_303_SEE_OTHER)
+    if level is None:
+        return RedirectResponse(
+            url="/specialist?level=licenciatura",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
     service = SpecialistService(db)
     summary = service.dashboard_summary(user)
+    section_title, section_lead = SPECIALIST_LEVEL_TITLES[level]
     return render(
         request,
         "specialist/dashboard.html",
         {
             "user": user,
-            "careers": service.list_careers(),
+            "careers": service.list_careers(level=level),
+            "active_level": level.value,
+            "level_nav": SPECIALIST_LEVEL_NAV,
+            "section_title": section_title,
+            "section_lead": section_lead,
             **summary,
         },
     )
@@ -380,7 +410,13 @@ def specialist_career_detail(
     return render(
         request,
         "specialist/career_detail.html",
-        {"user": user, "detail": detail, "editable_count": editable_count},
+        {
+            "user": user,
+            "detail": detail,
+            "editable_count": editable_count,
+            "active_level": detail.level,
+            "level_nav": SPECIALIST_LEVEL_NAV,
+        },
     )
 
 
@@ -394,9 +430,17 @@ def specialist_info_edit(
 ):
     """Editor de contenido de categoría (Quill + upload vía JS/API)."""
     PermissionService(db).require_edit(user, career_id, category_id)
-    info = SpecialistService(db).get_category_info(career_id, category_id, user)
+    service = SpecialistService(db)
+    info = service.get_category_info(career_id, category_id, user)
+    detail = service.get_career_detail(career_id, user)
     return render(
         request,
         "specialist/career_info_edit.html",
-        {"user": user, "career_id": career_id, "info": info},
+        {
+            "user": user,
+            "career_id": career_id,
+            "info": info,
+            "active_level": detail.level,
+            "level_nav": SPECIALIST_LEVEL_NAV,
+        },
     )

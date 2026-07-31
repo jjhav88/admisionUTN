@@ -30,7 +30,21 @@
           <a href="/admin/permissions">Permisos</a>
           <a href="/admin/discounts">Descuentos</a>
         {% else %}
-          <a href="/specialist">Carreras</a>
+          {% set nav_levels = level_nav if level_nav is defined and level_nav else [
+            ('licenciatura', 'Licenciatura'),
+            ('maestria', 'Maestrías'),
+            ('preparatoria', 'Preparatoria'),
+            ('curso_posgrado', 'Posgrado')
+          ] %}
+          {% set current_level = active_level if active_level is defined else none %}
+          {% for item in nav_levels %}
+            {% set level_value = item[0].value if item[0].value is defined else item[0] %}
+            {% set level_label = item[1] %}
+            <a
+              href="/specialist?level={{ level_value }}"
+              class="{% if current_level == level_value %}is-active{% endif %}"
+            >{{ level_label }}</a>
+          {% endfor %}
         {% endif %}
         <a href="/ayuda" title="Guía para usar el sistema">¿Cómo navegar?</a>
       </nav>

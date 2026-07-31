@@ -202,6 +202,11 @@ a:hover { color: var(--orange); }
 
 .nav a:hover { color: var(--text); }
 
+.nav a.is-active {
+  color: var(--orange-2);
+  font-weight: 600;
+}
+
 .user-chip {
   display: flex;
   align-items: center;

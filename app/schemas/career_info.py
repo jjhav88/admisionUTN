@@ -64,4 +64,5 @@ class CareerDetailRead(BaseModel):
     name: str
     slug: str
     description: str | None = None
+    level: str | None = None
     categories: list[CareerInfoGrouped] = Field(default_factory=list)
