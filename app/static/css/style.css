@@ -2214,11 +2214,46 @@ body.report-view .main {
   font-size: 0.95rem;
 }
 
+.discount-flip-desc-block {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 140, 0, 0.28);
+  background: rgba(255, 102, 0, 0.1);
+}
+
+.discount-flip-desc-label {
+  color: var(--orange-2);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .discount-flip-desc {
   margin: 0;
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.discount-desc-panel {
+  width: min(560px, 100%);
+}
+
+.discount-desc-body {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.05rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.discount-desc-body.is-empty {
   color: var(--muted);
-  font-size: 0.95rem;
-  line-height: 1.4;
+  font-style: italic;
 }
 
 .discount-flip-meta {

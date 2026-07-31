@@ -1401,6 +1401,13 @@ function renderDiscountRows(discounts) {
         </span>
       </td>
       <td class="actions">
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm"
+          data-view-discount-desc
+          data-discount-title="${escapeHtml(d.title)}"
+          data-discount-description="${escapeHtml(d.description || "")}"
+        >Ver descripción</button>
         <a class="btn btn-ghost btn-sm" href="/admin/discounts/${d.id}/edit">Editar</a>
         <button
           type="button"
@@ -1412,6 +1419,41 @@ function renderDiscountRows(discounts) {
     </tr>`
     )
     .join("");
+}
+
+function openDiscountDescModal(title, description) {
+  const modal = document.getElementById("discount-desc-modal");
+  const titleEl = document.getElementById("discount-desc-title");
+  const bodyEl = document.getElementById("discount-desc-body");
+  if (!modal || !titleEl || !bodyEl) return;
+  titleEl.textContent = title || "Descuento";
+  const text = (description || "").trim();
+  bodyEl.textContent = text || "Sin descripción registrada para esta oferta.";
+  bodyEl.classList.toggle("is-empty", !text);
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closeDiscountDescModal() {
+  const modal = document.getElementById("discount-desc-modal");
+  if (!modal) return;
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden", "true");
+}
+
+function initDiscountDescModal() {
+  const modal = document.getElementById("discount-desc-modal");
+  if (!modal) return;
+
+  document.getElementById("discount-desc-close")?.addEventListener("click", closeDiscountDescModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeDiscountDescModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) {
+      closeDiscountDescModal();
+    }
+  });
 }
 
 async function reloadDiscountsTable() {
@@ -2051,7 +2093,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   bindLiveSearch(document.getElementById("discount-search-form"), reloadDiscountsTable);
 
+  initDiscountDescModal();
   document.querySelector("#discounts-table")?.addEventListener("click", (e) => {
+    const viewBtn = e.target.closest("[data-view-discount-desc]");
+    if (viewBtn) {
+      openDiscountDescModal(
+        viewBtn.dataset.discountTitle || "",
+        viewBtn.dataset.discountDescription || ""
+      );
+      return;
+    }
     const deleteBtn = e.target.closest("[data-delete-discount]");
     if (deleteBtn) {
       deleteDiscount(

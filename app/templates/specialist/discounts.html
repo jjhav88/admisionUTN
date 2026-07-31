@@ -25,7 +25,10 @@
         </div>
         <div class="discount-flip-face discount-flip-back">
           <strong class="discount-flip-title">{{ d.title }}</strong>
-          <p class="discount-flip-desc">{{ d.description or 'Sin descripción adicional.' }}</p>
+          <div class="discount-flip-desc-block">
+            <span class="discount-flip-desc-label">Cómo funciona la oferta</span>
+            <p class="discount-flip-desc">{{ d.description or 'Sin descripción adicional.' }}</p>
+          </div>
           <ul class="discount-flip-meta">
             <li><span>Carrera</span><strong>{{ d.career_name or '—' }}</strong></li>
             <li><span>Categoría</span><strong>{{ d.category_name or 'General' }}</strong></li>

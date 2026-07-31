@@ -54,6 +54,13 @@
             </span>
           </td>
           <td class="actions">
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm"
+              data-view-discount-desc
+              data-discount-title="{{ discount.title|e }}"
+              data-discount-description="{{ (discount.description or '')|e }}"
+            >Ver descripción</button>
             <a class="btn btn-ghost btn-sm" href="/admin/discounts/{{ discount.id }}/edit">Editar</a>
             <button
               type="button"
@@ -70,4 +77,17 @@
     </table>
   </div>
 </section>
+
+<div class="modal" id="discount-desc-modal" aria-hidden="true" role="dialog" aria-labelledby="discount-desc-title">
+  <div class="modal-panel discount-desc-panel">
+    <header class="section-head">
+      <p class="eyebrow">Descripción de la oferta</p>
+      <h2 id="discount-desc-title">Descuento</h2>
+    </header>
+    <p class="discount-desc-body" id="discount-desc-body"></p>
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary" id="discount-desc-close">Cerrar</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
