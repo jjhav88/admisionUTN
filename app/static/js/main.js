@@ -1090,6 +1090,18 @@ function initSpecialistCareerSearch() {
   bindLiveSearch(form, reloadSpecialistCareers);
 }
 
+function initDiscountFlipCards() {
+  const cards = document.querySelectorAll("[data-discount-flip]");
+  if (!cards.length) return;
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      card.classList.toggle("is-flipped");
+      const flipped = card.classList.contains("is-flipped");
+      card.setAttribute("aria-pressed", flipped ? "true" : "false");
+    });
+  });
+}
+
 function initReportSearch() {
   const input = document.getElementById("report-search-input");
   if (!input) return;
@@ -2028,6 +2040,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initSettingsForm();
   initSpecialistCareerSearch();
   initReportSearch();
+  initDiscountFlipCards();
 
   const discountForm = document.getElementById("discount-form");
   discountForm?.addEventListener("submit", (e) => {

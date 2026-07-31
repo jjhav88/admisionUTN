@@ -305,6 +305,28 @@ def navigation_guide(
     return render(request, "help/guide.html", {"user": user})
 
 
+@router.get("/specialist/discounts", response_class=HTMLResponse)
+def specialist_discounts(
+    request: Request,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    """Listado de descuentos activos (solo lectura) para especialistas."""
+    if user.role_name == UserRole.ADMIN.value:
+        return RedirectResponse(url="/admin/discounts", status_code=status.HTTP_303_SEE_OTHER)
+    discounts = SpecialistService(db).list_discounts(active_only=True)
+    return render(
+        request,
+        "specialist/discounts.html",
+        {
+            "user": user,
+            "discounts": discounts,
+            "active_nav": "discounts",
+            "level_nav": SPECIALIST_LEVEL_NAV,
+        },
+    )
+
+
 @router.get("/admin/discounts", response_class=HTMLResponse)
 def admin_discounts(
     request: Request,

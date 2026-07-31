@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Descuentos · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="section specialist-discounts">
+  <header class="section-head">
+    <h1>Descuentos</h1>
+    <p>Consulta las promociones activas. Haz clic en una tarjeta para ver el detalle.</p>
+  </header>
+
+  {% if discounts %}
+  <div class="discount-flip-grid" id="discount-flip-grid">
+    {% for d in discounts %}
+    <button
+      type="button"
+      class="discount-flip"
+      data-discount-flip
+      aria-label="Ver detalle de {{ d.title }}"
+    >
+      <div class="discount-flip-inner">
+        <div class="discount-flip-face discount-flip-front">
+          <span class="discount-flip-badge">{{ d.percentage }}%</span>
+          <strong class="discount-flip-title">{{ d.title }}</strong>
+          <span class="discount-flip-career">{{ d.career_name or 'Carrera' }}</span>
+          <span class="discount-flip-hint">Toca para ver detalle</span>
+        </div>
+        <div class="discount-flip-face discount-flip-back">
+          <strong class="discount-flip-title">{{ d.title }}</strong>
+          <p class="discount-flip-desc">{{ d.description or 'Sin descripción adicional.' }}</p>
+          <ul class="discount-flip-meta">
+            <li><span>Carrera</span><strong>{{ d.career_name or '—' }}</strong></li>
+            <li><span>Categoría</span><strong>{{ d.category_name or 'General' }}</strong></li>
+            <li><span>Descuento</span><strong>{{ d.percentage }}%</strong></li>
+            <li>
+              <span>Vigencia</span>
+              <strong>
+                {% if d.start_date %}{{ d.start_date.strftime('%d/%m/%Y') }}{% else %}—{% endif %}
+                →
+                {% if d.end_date %}{{ d.end_date.strftime('%d/%m/%Y') }}{% else %}Ilimitado{% endif %}
+              </strong>
+            </li>
+          </ul>
+          <span class="discount-flip-hint">Toca para volver</span>
+        </div>
+      </div>
+    </button>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted panel" style="padding:1.25rem;">No hay descuentos activos por ahora.</p>
+  {% endif %}
+</section>
+{% endblock %}

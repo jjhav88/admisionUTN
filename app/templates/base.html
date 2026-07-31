@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/style.css?v=20260731h">
+  <link rel="stylesheet" href="/static/css/style.css?v=20260731i">
   {% block head %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
@@ -48,6 +48,10 @@
               class="{% if current_level == level_value %}is-active{% endif %}"
             >{{ level_label }}</a>
           {% endfor %}
+          <a
+            href="/specialist/discounts"
+            class="{% if active_nav is defined and active_nav == 'discounts' %}is-active{% endif %}"
+          >Descuentos</a>
         {% endif %}
         <a href="/ayuda" title="Guía para usar el sistema">¿Cómo navegar?</a>
       </nav>
@@ -137,7 +141,7 @@
     </div>
   </div>
 
-  <script src="/static/js/main.js?v=20260731c"></script>
+  <script src="/static/js/main.js?v=20260731i"></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>
