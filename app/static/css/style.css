@@ -424,6 +424,26 @@ a:hover { color: var(--orange); }
   background: linear-gradient(180deg, rgba(18, 18, 18, 0.78), rgba(10, 10, 10, 0.82));
   backdrop-filter: blur(10px);
   border-color: rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.login-page .auth-panel .eyebrow,
+.login-page .auth-panel .brand-hero,
+.login-page .auth-panel .lead {
+  text-align: center;
+}
+
+.login-page .auth-panel .login-brand-logo {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.login-page .auth-panel .stack-form {
+  text-align: left;
+}
+
+.login-page .auth-panel .stack-form .btn {
+  width: 100%;
 }
 
 .auth-panel {
