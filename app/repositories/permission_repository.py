@@ -51,6 +51,19 @@ class PermissionRepository:
             .all()
         )
 
+    def list_by_user_and_careers(self, user_id: int, career_ids: list[int]) -> list[Permission]:
+        """Permisos de un usuario limitados a un conjunto de carreras."""
+        if not career_ids:
+            return []
+        return list(
+            self.db.scalars(
+                select(Permission).where(
+                    Permission.user_id == user_id,
+                    Permission.career_id.in_(career_ids),
+                )
+            ).all()
+        )
+
     def create(self, permission: Permission) -> Permission:
         self.db.add(permission)
         self.db.commit()

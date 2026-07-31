@@ -17,10 +17,14 @@ class PermissionCreate(PermissionBase):
 
 
 class PermissionBulkCreate(BaseModel):
-    """Asigna permisos para el producto de categorías × carreras."""
+    """Sincroniza permisos para el producto de categorías × carreras.
+
+    Para cada carrera seleccionada, el estado final queda exactamente como
+    las categorías marcadas (las desmarcadas se revocan).
+    """
 
     user_id: int
-    category_ids: list[int] = Field(min_length=1)
+    category_ids: list[int] = Field(default_factory=list)
     career_ids: list[int] = Field(min_length=1)
     can_edit: bool = True
 

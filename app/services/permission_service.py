@@ -44,7 +44,7 @@ class PermissionService:
         return self.repo.create(Permission(**data.model_dump()))
 
     def create_bulk(self, data: PermissionBulkCreate) -> list[Permission]:
-        """Crea/actualiza un permiso por cada combinación categoría × carrera."""
+        """Sincroniza permisos: deja solo las categorías marcadas en las carreras elegidas."""
 
         def unique(ids: list[int]) -> list[int]:
             seen: set[int] = set()
@@ -58,6 +58,13 @@ class PermissionService:
 
         category_ids = unique(data.category_ids)
         career_ids = unique(data.career_ids)
+        allowed = set(category_ids)
+
+        # Revocar lo que ya no está marcado (en las carreras del formulario).
+        for permission in self.repo.list_by_user_and_careers(data.user_id, career_ids):
+            if permission.category_id not in allowed:
+                self.repo.delete(permission)
+
         created: list[Permission] = []
         for category_id in category_ids:
             for career_id in career_ids:

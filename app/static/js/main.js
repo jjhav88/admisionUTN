@@ -1124,10 +1124,6 @@ async function handlePermissionForm(form) {
     notify("Selecciona un especialista", "error");
     return;
   }
-  if (!categoryIds.length) {
-    notify("Selecciona al menos una categoría", "error");
-    return;
-  }
   if (!careerIds.length) {
     notify("Selecciona al menos una carrera", "error");
     return;
@@ -1142,7 +1138,11 @@ async function handlePermissionForm(form) {
     });
     const count = Array.isArray(created) ? created.length : categoryIds.length * careerIds.length;
     notify(
-      count === 1 ? "Permiso asignado" : `${count} permisos asignados`,
+      categoryIds.length === 0
+        ? "Permisos revocados en las carreras seleccionadas"
+        : count === 1
+          ? "Permisos actualizados (1 asignación)"
+          : `Permisos actualizados (${count} asignaciones)`,
       "ok"
     );
     window.location.reload();
