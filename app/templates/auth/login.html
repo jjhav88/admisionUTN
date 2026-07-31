@@ -6,6 +6,9 @@
   <div class="auth-panel">
     <p class="eyebrow">Sistema de admisión</p>
     <h1 class="brand-hero">{{ app_name }}</h1>
+    {% if site and site.header_logo_url %}
+    <img class="login-brand-logo" src="{{ site.header_logo_url }}" alt="Logo {{ app_name }}">
+    {% endif %}
     <p class="lead">Sistema de Gestión de Información para Admisiones</p>
 
     <div id="login-error" class="alert alert-error" hidden></div>

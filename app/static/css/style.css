@@ -358,6 +358,15 @@ a:hover { color: var(--orange); }
 .section-head h1 { font-size: clamp(1.8rem, 3vw, 2.4rem); }
 .brand-hero { font-size: clamp(2.4rem, 6vw, 3.8rem); color: var(--text); }
 
+.login-brand-logo {
+  display: block;
+  width: auto;
+  height: 96px;
+  max-width: min(280px, 100%);
+  margin: 0.35rem 0 0.85rem;
+  object-fit: contain;
+}
+
 .lead, .section-head p, .muted { color: var(--muted); }
 .eyebrow {
   text-transform: uppercase;
