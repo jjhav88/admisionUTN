@@ -179,9 +179,9 @@ a:hover { color: var(--orange); }
 }
 
 .brand-logo {
-  height: 40px;
+  height: 56px;
   width: auto;
-  max-width: 140px;
+  max-width: 200px;
   object-fit: contain;
   display: block;
 }
