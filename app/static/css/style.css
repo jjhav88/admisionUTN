@@ -1450,6 +1450,22 @@ code {
   justify-content: flex-end;
 }
 
+/* Tabla de descuentos admin: más ancha y botones en una sola fila */
+body:has(#discounts-page) .main {
+  width: min(1480px, calc(100% - 2rem));
+}
+
+#discounts-table .actions {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  min-width: 22rem;
+  gap: 0.45rem;
+}
+
+#discounts-table td.actions {
+  width: 1%;
+}
+
 .info-register-block {
   display: grid;
   gap: 1rem;
