@@ -117,6 +117,16 @@ async function apiRequest(url, options = {}) {
   }
 
   if (!response.ok) {
+    // Sesión caducada: limpiar token y llevar al login (excepto en el propio login).
+    if (
+      response.status === 401 &&
+      !url.includes("/api/auth/login") &&
+      !window.location.pathname.startsWith("/login")
+    ) {
+      clearToken();
+      window.location.href = "/login";
+      throw new Error("Sesión expirada");
+    }
     const detail = data?.detail;
     const message =
       typeof detail === "string"

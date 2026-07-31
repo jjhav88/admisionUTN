@@ -3,13 +3,14 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import get_settings
 from app.core.database import SessionLocal, engine
@@ -24,6 +25,18 @@ from seed import run_seed
 settings = get_settings()
 setup_logging(settings.debug)
 logger = get_logger()
+
+
+def _wants_login_redirect(request: Request) -> bool:
+    """True si es navegación de página (HTML), no llamada a la API JSON."""
+    path = request.url.path
+    if path.startswith("/api/") or path in {"/health", "/openapi.json", "/docs", "/redoc"}:
+        return False
+    accept = (request.headers.get("accept") or "").lower()
+    # fetch/XHR suelen pedir JSON; el browser al refrescar pide text/html.
+    if "application/json" in accept and "text/html" not in accept:
+        return False
+    return True
 
 
 @asynccontextmanager
@@ -68,6 +81,30 @@ app.add_middleware(
 async def app_error_handler(_: Request, exc: AppError) -> JSONResponse:
     """Convierte errores de dominio en JSON {detail, status_code}."""
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """En páginas HTML, sesión caducada → login; en API se mantiene JSON."""
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED and _wants_login_redirect(request):
+        response = RedirectResponse(url="/login", status_code=303)
+        response.delete_cookie(settings.cookie_name)
+        return response
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers=dict(exc.headers) if exc.headers else None,
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def starlette_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Misma política de redirect para excepciones Starlette (p. ej. 401)."""
+    if exc.status_code == 401 and _wants_login_redirect(request):
+        response = RedirectResponse(url="/login", status_code=303)
+        response.delete_cookie(settings.cookie_name)
+        return response
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 
 static_dir = Path(__file__).parent / "app" / "static"
